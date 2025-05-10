@@ -74,7 +74,7 @@ vvis/
 vvis_launcher/
 
 # no temp or compiled Shader files
-fxctmp9/
+fxctmp9_tmp/
 
 # allow these, for modders' convenience
 # *.inc
