@@ -1,10 +1,12 @@
 DARK INTERVAL Source Code
 
 1. Contents
+
 This repository contains a copy of Dark Interval's development repository.
 It includes everything needed to build the client, server, and shader DLLs of the mod.
 
 2. Building
+
 The build process for the most part is the same as with Source SDK Base 2013 Singleplayer.
 One notable point of difference is that Dark Interval got rid of VPC mechanism, instead
 shipping the ready solution and project files. This was done largely due to problems and 
@@ -26,6 +28,7 @@ materialsystem/_compiled_bin
 and the bin/ folder of the repository, next to src/.
 
 3. Notes
+
 The first point of difference is that this repository is not forked from Valve's SDK 2013 repo.
 This was done for two reasons: to reduce the bloat (as Valve's repo used to include both
 MP and SP code together, plus a number of unnecessary libraries and rarely used source code),
@@ -67,6 +70,7 @@ If you are interested in the 'live ragdolls' code, you can find all of it by sea
 'DI NEW: Live Ragdolls Experiment'.
 
 4. On the leak code
+
 There are a few instances of 2003 leak code being used. Specifically, npc_antlionguard.cpp includes
 a number of cut AI routines copied over from 2003 (they are commented as such). view.cpp and viewrender.h
 include copied engine code for skybox drawing as a fix for skybox culling at high FOV.
@@ -76,6 +80,7 @@ Dark Interval installments. It is all put inside of game/server/portal, game/cli
 separated inside the solution, so it is easy to ignore it.
 
 5. Third party sources
+
 Dark Interval is built using selective fixes and features from the following sources:
 Transmissions: Element 120 - the HEV locator code
 https://github.com/shokunin000/te120
@@ -87,6 +92,7 @@ Alien Swarm - shader sources such as flowmapped water, parallax, object motion b
 https://github.com/Source-SDK-Archives/source-sdk-alien-swarm
 
 6. Usage and crediting
+
 First and foremost Dark Interval code, being based on Valve's SDK code, is subject to included Valve's license.
 As for the custom DI code, you are free to use it in your non-commercial projects if you give credit to
 the original source. You can make forks and redistribute this code if you credit and link the original source.
