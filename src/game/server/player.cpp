@@ -6450,7 +6450,9 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 #ifdef _DEBUG
 	if ( stricmp(cmd, "test_SmokeGrenade") == 0 )
 	{
+#ifndef DARKINTERVAL // DI doesn't care about sv_cheats
 		if ( sv_cheats && sv_cheats->GetBool() )
+#endif
 		{
 			ParticleSmokeGrenade *pSmoke = dynamic_cast<ParticleSmokeGrenade*>( CreateEntityByName(PARTICLESMOKEGRENADE_ENTITYNAME) );
 			if ( pSmoke )

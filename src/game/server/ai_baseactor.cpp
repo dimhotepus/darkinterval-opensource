@@ -991,7 +991,7 @@ void CAI_BaseActor::UpdateHeadControl( const Vector &vHeadTarget, float flHeadIn
 	if (scene_clamplookat.GetBool())
 	{
 		// scale down pitch when the target is behind the head
-		Vector vTargetLocal; MaintainLookTargets
+		Vector vTargetLocal;
 		VectorNormalize( vTargetDir );
 		VectorIRotate( vTargetDir, forwardToWorld, vTargetLocal );
 		vTargetLocal.z *= clamp( vTargetLocal.x, 0.1f, 1.0f );
