@@ -1,0 +1,387 @@
+//==================================================================================================
+//
+// Physically Based Rendering pixel shader for brushes and models
+//
+//==================================================================================================
+
+// STATIC: "FLASHLIGHT"                 "0..1"
+// STATIC: "FLASHLIGHTDEPTHFILTERMODE"  "0..2"
+// STATIC: "LIGHTMAPPED"                "0..1"
+// STATIC: "USEENVAMBIENT"              "0..1" // note: disabled because doesn't seem practical to keep.
+// STATIC: "EMISSIVE"                   "0..1"
+// STATIC: "SPECULAR"                   "0..0" // note: disabled because doesn't seem practical to keep.
+// STATIC: "PARALLAXLAYER"				"0..1"
+// STATIC: "DYNAMICSNOW"				"0..1"
+// STATIC: "DYNAMICSNOWTEXTURE"			"0..1" // note: we use this to avoid binding the same bumpmap again in case this texture was not specified.
+// STATIC: "BLENDED"					"0..1"
+// STATIC: "BLENDMODULATE"				"0..1" // todo: find what is wrong with texture-mapped blending.
+// STATIC: "ALPHABLEND"					"0..1"
+
+// DYNAMIC: "WRITEWATERFOGTODESTALPHA"  "0..1"
+// DYNAMIC: "PIXELFOGTYPE"              "0..1"
+// DYNAMIC: "NUM_LIGHTS"                "0..4"
+// DYNAMIC: "WRITE_DEPTH_TO_DESTALPHA"  "0..1"
+// DYNAMIC: "FLASHLIGHTSHADOWS"         "0..1"
+
+// Can't write fog to alpha if there is no fog
+// SKIP: ($PIXELFOGTYPE == 0) && ($WRITEWATERFOGTODESTALPHA != 0)
+// We don't care about flashlight depth unless the flashlight is on
+// SKIP: ( $FLASHLIGHT == 0 ) && ( $FLASHLIGHTSHADOWS == 1 )
+// Flashlight shadow filter mode is irrelevant if there is no flashlight
+// SKIP: ( $FLASHLIGHT == 0 ) && ( $FLASHLIGHTDEPTHFILTERMODE != 0 )
+// the two are mutually excluded
+// SKIP: ( $BLENDED != 0 ) && ( $PARALLAXLAYER != 0)
+// blend is not possible on models
+// SKIP: ( $BLENDED != 0 ) && ( $LIGHTMAPPED == 0 )
+// parallax is only done on models
+// SKIP: ( $PARALLAXLAYER != 0 ) && ( $LIGHTMAPPED != 0 )
+
+#include "common_ps_fxc.h"
+#include "common_flashlight_fxc.h"
+#include "common_lightmappedgeneric_fxc.h"
+#include "shader_constant_register_map.h"
+
+#include "pbr_common_ps2_3_x.h"
+
+// FREE CONSTANTS: PSREG_FRESNEL_SPEC_PARAMS 27
+const float4 g_BaseColor                        : register(PSREG_SELFILLUMTINT); // 00
+const float4 g_DiffuseModulation                : register(PSREG_DIFFUSE_MODULATION); // 01
+const float4 g_ShadowTweaks                     : register(PSREG_ENVMAP_TINT__SHADOW_TWEAKS); // 02
+const float3 cAmbientCube[6]                    : register(PSREG_AMBIENT_CUBE); // 04...09
+const float4 g_EyePos                           : register(PSREG_EYEPOS_SPEC_EXPONENT); // 11
+const float4 g_FogParams                        : register(PSREG_FOG_PARAMS); // 12
+const float4 g_FlashlightAttenuationFactors     : register(PSREG_FLASHLIGHT_ATTENUATION); // 13
+const float4 g_FlashlightPos                    : register(PSREG_FLASHLIGHT_POSITION_RIM_BOOST); // 14
+const float4x4 g_FlashlightWorldToTexture       : register(PSREG_FLASHLIGHT_TO_WORLD_TEXTURE); // 15...18
+PixelShaderLightInfo cLightInfo[3]              : register(PSREG_LIGHT_INFO_ARRAY); // 20...25
+
+const float4 g_EmissionScale                    : register(c2);
+
+const float4 g_SnowParams						: register(PSREG_ENVMAP_FRESNEL__SELFILLUMMASK); // 10
+#define SNOWDIR g_SnowParams.xyz
+#define SNOWDOT g_SnowParams.w
+
+const float4 g_SnowParams2						: register(PSREG_SELFILLUM_SCALE_BIAS_EXP); // 03
+#define SNOWBLENDFACTOR g_SnowParams2.x
+
+// FREE SAMPLERS LEFT: none
+
+sampler BaseTextureSampler          : register(s0);     // Base map, selfillum in alpha
+sampler NormalTextureSampler        : register(s1);     // Normal map
+
+#if BLENDED && !PARALLAXLAYER
+	sampler BaseTexture2Sampler			: register(s3);		// Base map 2
+	sampler NormalTexture2Sampler       : register(s13);     // Normal map 2
+	#if BLENDMODULATE
+		sampler BlendModulationSampler	: register(s15); // blendmodulationmap
+	#endif
+	sampler MRO2TextureSampler       : register(s12);     // Secondary MRO
+#endif
+
+#if PARALLAXLAYER && !BLENDED
+	sampler Parallax1Sampler		: register(s3);		// Parallax layer 1
+	sampler Parallax2Sampler		: register(s13);     // Parallax layer 2
+//	sampler _freeSampler			: register(s9);
+
+const float4 g_Parallax1Params      : register(c19);
+const float4 g_Parallax2Params      : register(c26);
+	
+#endif
+
+sampler EnvmapSampler               : register(s2);     // Cubemap
+sampler ShadowDepthSampler          : register(s4);     // Flashlight shadow depth map sampler
+sampler RandRotSampler              : register(s5);     // RandomRotation sampler
+sampler FlashlightSampler           : register(s6);     // Flashlight cookie 
+sampler LightmapSampler             : register(s7);     // Lightmap
+sampler MROTextureSampler           : register(s10);    // MRO texture
+sampler AccumulatedSampler			: register(s14);	// The texture that replaces pixels for the dynamic snow layer
+
+#if EMISSIVE
+	sampler EmissionTextureSampler      : register(s11);    // Emission texture
+#endif
+
+//#if SPECULAR
+//	sampler SpecularTextureSampler      : register(s12);    // Specular F0 texture
+//#endif
+
+#if !FLASHLIGHT
+const float4 g_EnvMapValues         : register(c31); // in cpp, envmaptint and such are packed when flashlight is not used
+#endif
+
+#define ENVMAPLOD (g_EyePos.a)
+
+struct PS_INPUT
+{
+    float2 baseTexCoord             : TEXCOORD0;
+    float4 lightAtten               : TEXCOORD1;
+    float3 worldNormal              : TEXCOORD2;
+    float3 worldPos                 : TEXCOORD3;
+    float3 projPos                  : TEXCOORD4;
+    float4 lightmapTexCoord1And2    : TEXCOORD5; 
+    float4 lightmapTexCoord3        : TEXCOORD6;
+	#if BLENDED
+    float blend                     : COLOR0;
+	#endif
+};
+
+// Entry point
+float4 main(PS_INPUT i) : COLOR
+{
+    // Prepare ambient and direct in advance
+    float3 ambientLighting = 0.0;
+    float3 directLighting = 0.0;
+//	float diffuseO-N = 0.0;
+
+#if USEENVAMBIENT
+    float3 EnvAmbientCube[6];
+    setupEnvMapAmbientCube(EnvAmbientCube, EnvmapSampler);
+#else
+    #define EnvAmbientCube cAmbientCube
+#endif
+
+    float3 surfNormal = normalize(i.worldNormal);
+    float3 surfTangent;
+    float3 surfBase; 
+    float flipSign;
+    float3x3 normalBasis = compute_tangent_frame(surfNormal, i.worldPos, i.baseTexCoord , surfTangent, surfBase, flipSign);
+	
+    float2 correctedTexCoord = i.baseTexCoord;
+#if BLENDED
+	float3 normalColor = tex2D(NormalTextureSampler, correctedTexCoord).xyz * 2.0f - 1.0f;
+	float3 normal2Color = tex2D(NormalTexture2Sampler, correctedTexCoord).xyz * 2.0f - 1.0f;
+	float3 textureNormal = normalize(lerp(normalColor, normal2Color, i.blend));
+#else
+    float3 textureNormal = normalize(tex2D( NormalTextureSampler,  correctedTexCoord).xyz * 2.0f - 1.0f);
+#endif
+    float3 normal = normalize(mul(textureNormal, normalBasis)); // World Normal	
+#if DYNAMICSNOW
+	bool snowDotCheckPassed = false;
+	float dirX = g_SnowParams.x, dirY = g_SnowParams.y, dirZ = g_SnowParams.z;
+	if(dot(normal, float3(dirX, dirY, dirZ)) > SNOWDOT )
+	{
+		snowDotCheckPassed = true;
+	}
+#endif
+		
+#if BLENDED
+	float blendfactor= i.blend;
+#if BLENDMODULATE
+	float4 modt=tex2D(BlendModulationSampler, correctedTexCoord);
+	float minb=modt.g-modt.r;
+	float maxb=modt.g+modt.r;
+	blendfactor=smoothstep(minb,maxb,blendfactor);
+#endif
+    float4 albedo = lerp(tex2D(BaseTextureSampler, correctedTexCoord), tex2D(BaseTexture2Sampler, correctedTexCoord), blendfactor);
+#else
+    float4 albedo = tex2D(BaseTextureSampler, correctedTexCoord);
+#endif
+
+#if ALPHABLEND
+	float3 blendColor;
+	blendColor.rgb = g_SnowParams2.yzw;
+//	albedo.rgb += albedo.a * blendColor.rgb; // additive
+//	albedo.rgb = lerp( albedo.rgb, albedo.rgb*blendColor.rgb, albedo.a); // multiply
+
+	albedo.rgb += lerp( albedo.rgb, blendColor, 1 - albedo.a ); // base over detail
+#endif
+
+    albedo.xyz *= g_BaseColor; // todo: we may want to use this only without blend? 
+	
+#if PARALLAXLAYER && !LIGHTMAPPED
+    float3 vViewVector = normalize(g_EyePos.xyz - i.worldPos);
+	float2 vParallax1Vector;
+
+//	float fParallaxLength = length(g_EyePos.xyz - i.worldPos);
+//	vParallax1Vector.xy = ( vViewVector.xy ) * ( vViewVector.z * g_Parallax1Params.x);
+//	float2 vParallaxOffsetTS = vParallax1Vector * fParallaxLength;	
+
+// layer 1
+	float heightTex = g_Parallax1Params.x;
+	float2 Parallax1Offset = ParallaxOffset(heightTex, g_Parallax1Params.y, 0.42, vViewVector);		
+	float2 vParallax1UV = correctedTexCoord.xy - Parallax1Offset.xy;
+	vParallax1UV *= g_Parallax1Params.z;
+	float3 parallax1Color = tex2D(Parallax1Sampler, vParallax1UV).xyz;
+
+// layer 2
+	heightTex = g_Parallax2Params.x;
+	float2 Parallax2Offset = ParallaxOffset(heightTex, g_Parallax2Params.y, 0.42, vViewVector);		
+	float2 vParallax2UV = correctedTexCoord.xy - Parallax2Offset.xy;
+	vParallax2UV *= g_Parallax2Params.z;
+	float3 parallax2Color = tex2D(Parallax2Sampler, vParallax2UV).xyz;
+
+//	return float4( parallax1Color, 1.0f);
+	
+	albedo.rgb *= lerp(float3(1,1,1), 2.0*parallax1Color.rgb, 1.0f); // apply parallax layer 1 as Modulate blend
+	albedo.rgb *= lerp(float3(1,1,1), 2.0*parallax2Color.rgb, 1.0f); // apply parallax layer 2 as Modulate blend
+#endif
+	
+//#if BLENDED
+//	float3 mroColor = tex2D(MROTextureSampler, correctedTexCoord).xyz;
+//	float3 mro2Color = tex2D(MROTextureSampler, correctedTexCoord).xyz;
+
+//	return float4(mro2Color.rgb, 1);
+
+//	float3 mro = lerp(mroColor, mro2Color, blendfactor);
+
+//    float metalness = lerp(mroColor.x, mro2Color.x, blendfactor), 
+//		roughness = lerp(mroColor.y, mro2Color.y, blendfactor), 
+//		ambientOcclusion = lerp(mroColor.z, mro2Color.z, blendfactor);
+//#else
+	float3 mro = tex2D(MROTextureSampler, correctedTexCoord).xyz;
+    float metalness = mro.x, roughness = mro.y, ambientOcclusion = mro.z;
+//#endif // todo: blend on MRO maps messes up lighting... figure out why.
+
+//	float3 mro = tex2D(MROTextureSampler, correctedTexCoord).xyz;
+//  float metalness = mro.x, roughness = mro.y, ambientOcclusion = mro.z;
+			
+#if DYNAMICSNOW // we want snow pixel replacement to happen after albedo is defined
+				// (replacing the texture's values), after normal is defined 
+				// (so snow follows bumpmapped texture relief), and before
+				// lighting calculations (so snow doesn't appear fullbright).
+	if(snowDotCheckPassed) // already checked it above
+	{
+		albedo.rgb = float3(1,1,1);
+		metalness = 0.0012;
+		roughness = 0.960;
+		#if DYNAMICSNOWTEXTURE // if we have a snow texture that's different from our regular normalmap, then...
+			float3 accumulatedColor = tex2D(AccumulatedSampler, correctedTexCoord).xyz * 2.0f - 1.0f;
+			float3 underlyingColor = tex2D(NormalTextureSampler, correctedTexCoord).xyz * 2.0f - 1.0f;
+			textureNormal = normalize(lerp(underlyingColor, accumulatedColor, SNOWBLENDFACTOR ));  // blend underlying normalmap and snow normalmap together
+			normal = normalize(mul(textureNormal, normalBasis));
+		#endif
+	}
+#endif
+
+#if EMISSIVE
+    float3 emission = tex2D(EmissionTextureSampler, correctedTexCoord).xyz  * g_EmissionScale.xyz * g_EmissionScale.w;
+#endif
+
+//#if SPECULAR
+//   float3 specular = tex2D(SpecularTextureSampler, correctedTexCoord).xyz;
+//#endif
+    
+    textureNormal.y *= flipSign; // Fixup textureNormal for ambient lighting
+
+    float3 outgoingLightDirection = normalize(g_EyePos.xyz - i.worldPos); // Lo
+    float lightDirectionAngle = max(0, dot(normal, outgoingLightDirection)); // cosLo
+
+    float3 specularReflectionVector = 2.0 * lightDirectionAngle * normal - outgoingLightDirection; // Lr
+
+//#if SPECULAR
+//    float3 fresnelReflectance = specular.rgb; // F0
+//#else
+    float3 dielectricCoefficient = 0.08; //F0 dielectric
+    float3 fresnelReflectance = lerp(dielectricCoefficient, albedo.rgb, metalness ); // F0
+//#endif
+
+#if !FLASHLIGHT
+    float4 modul = g_DiffuseModulation;
+    //modul.xyz = lerp(modul.xyz, hsv2rgb(modulHSV), mro.w);
+
+    // Start ambient
+
+    float3 diffuseIrradiance = ambientLookup(normal, EnvAmbientCube, textureNormal, i.lightmapTexCoord1And2, 
+	i.lightmapTexCoord3, LightmapSampler, g_DiffuseModulation);
+	    
+    float3 ambientLightingFresnelTerm = fresnelSchlickRoughness(fresnelReflectance, lightDirectionAngle, roughness); // F
+//#if SPECULAR
+//    float3 diffuseContributionFactor = 1 - ambientLightingFresnelTerm; // kd
+//#else
+	float3 diffuseContributionFactor = lerp(1 - ambientLightingFresnelTerm, 0, metalness); ; // kd
+//	diffuseContributionFactor += diffuseOrenNayar(lightDirectionAngle, outgoingLightDirection, normal, roughness);
+//#endif
+    float3 diffuseIBL = diffuseContributionFactor * albedo.rgb * diffuseIrradiance;
+
+    float4 specularUV = float4(specularReflectionVector, roughness * ENVMAPLOD);
+    float3 lookupHigh = ENV_MAP_SCALE * texCUBElod(EnvmapSampler, specularUV).xyz;
+	
+#if 1	
+	// Unpacking the values
+	float EnvMapContrast    =   floor(g_EnvMapValues.w);
+    float EnvMapSaturation  =   (g_EnvMapValues.w - EnvMapContrast) *100.0f;
+
+	lookupHigh *= g_EnvMapValues.xyz;
+	float3 lookupHighSquared = lookupHigh * lookupHigh;
+	lookupHigh = lerp( lookupHigh, lookupHighSquared, EnvMapContrast );
+	float3 greyScale = dot( lookupHigh, float3( 0.299f, 0.587f, 0.114f ) );
+	lookupHigh = lerp( greyScale, lookupHigh, EnvMapSaturation );
+#endif
+
+    float3 lookupLow = PixelShaderAmbientLight(specularReflectionVector, EnvAmbientCube);		
+    float3 specularIrradiance = lerp(lookupHigh, lookupLow, roughness * roughness);
+    float3 specularIBL = specularIrradiance * EnvBRDFApprox(fresnelReflectance, roughness, lightDirectionAngle);
+
+    ambientLighting = (diffuseIBL + specularIBL) * ambientOcclusion;
+
+    // End ambient
+
+    // Start direct
+    for (uint n = 0; n < NUM_LIGHTS; ++n)
+    {
+        float3 LightIn = normalize(PixelShaderGetLightVector(i.worldPos, cLightInfo, n));
+        float3 LightColor = PixelShaderGetLightColor(cLightInfo, n) * GetAttenForLight(i.lightAtten, n); // Li
+		
+        directLighting += calculateLight(LightIn, LightColor, outgoingLightDirection,
+                    normal, fresnelReflectance, roughness, metalness, lightDirectionAngle, albedo.rgb);
+    }
+    // End direct
+#else // if FLASHLIGHT
+
+    // Start flashlight
+    float4 flashlightSpacePosition = mul(float4(i.worldPos, 1.0), g_FlashlightWorldToTexture);
+    clip( flashlightSpacePosition.w ); // stop projected textures from projecting backwards (only really happens if they have a big FOV because they get frustum culled.)
+    float3 vProjCoords = flashlightSpacePosition.xyz / flashlightSpacePosition.w;
+
+    float3 delta = g_FlashlightPos.xyz - i.worldPos;
+    float distSquared = dot(delta, delta);
+    float dist = sqrt(distSquared);
+
+    float3 flashlightColor = tex2D(FlashlightSampler, vProjCoords.xy);
+    flashlightColor *= cFlashlightColor.xyz;
+
+#if FLASHLIGHTSHADOWS
+    float flashlightShadow = DoFlashlightShadow(ShadowDepthSampler, RandRotSampler, vProjCoords, i.projPos, FLASHLIGHTDEPTHFILTERMODE, g_ShadowTweaks, true);
+    float flashlightAttenuated = lerp(flashlightShadow, 1.0, g_ShadowTweaks.y);         // Blend between fully attenuated and not attenuated
+    float fAtten = saturate(dot(g_FlashlightAttenuationFactors.xyz, float3(1.0, 1.0 / dist, 1.0 / distSquared)));
+    flashlightShadow = saturate(lerp(flashlightAttenuated, flashlightShadow, fAtten));  // Blend between shadow and above, according to light attenuation
+
+    flashlightColor *= flashlightShadow;
+#endif
+
+	float farZ = g_FlashlightAttenuationFactors.w;
+	float endFalloffFactor = RemapValClamped(dist, farZ, 0.6 * farZ, 0.0, 1.0);
+	float3 flashLightIntensity = flashlightColor * endFalloffFactor;        
+	float3 flashLightIn = normalize(g_FlashlightPos.xyz - i.worldPos);
+
+	directLighting += max(0, calculateLight(flashLightIn, flashLightIntensity, outgoingLightDirection,
+	normal, fresnelReflectance, roughness, metalness, lightDirectionAngle, albedo.rgb));
+// End flashlight	
+#endif // !FLASHLIGHT
+
+float fogFactor = 0.0f;
+
+#if !FLASHLIGHT
+	fogFactor = CalcPixelFogFactor(PIXELFOGTYPE, g_FogParams, g_EyePos.z, i.worldPos.z, i.projPos.z);
+#endif
+
+float alpha = 0.0f;
+#if !FLASHLIGHT
+	#if WRITEWATERFOGTODESTALPHA && (PIXELFOGTYPE == PIXEL_FOG_TYPE_HEIGHT)
+	alpha = fogFactor;
+	#else
+	alpha = albedo.a;
+	#endif
+#endif // if !flashlight
+
+bool bWriteDepthToAlpha = (WRITE_DEPTH_TO_DESTALPHA != 0) && (WRITEWATERFOGTODESTALPHA == 0);
+
+float3 combinedLighting; 
+	combinedLighting = (directLighting + ambientLighting);
+#if EMISSIVE && !FLASHLIGHT
+	combinedLighting += emission;
+#endif
+
+    alpha *= g_DiffuseModulation.a;
+
+return FinalOutput(float4(combinedLighting, alpha), fogFactor, PIXELFOGTYPE, TONEMAP_SCALE_LINEAR, bWriteDepthToAlpha, i.projPos.z);
+}

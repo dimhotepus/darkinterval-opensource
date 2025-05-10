@@ -1,0 +1,534 @@
+//========================================================================//
+//
+// Purpose: 
+//
+// $NoKeywords: $
+//=============================================================================//
+
+#ifndef AI_ACTIVITY_H
+#define AI_ACTIVITY_H
+#ifdef _WIN32
+#pragma once
+#endif
+
+#define ACTIVITY_NOT_AVAILABLE		-1
+
+typedef enum
+{
+	ACT_INVALID = -1,			// So we have something more succint to check for than '-1'
+	ACT_RESET = 0,				// Set m_Activity to this invalid value to force a reset to m_IdealActivity
+	ACT_IDLE,
+	ACT_TRANSITION,
+	ACT_COVER,					// FIXME: obsolete? redundant with ACT_COVER_LOW?
+	ACT_COVER_MED,				// FIXME: unsupported?
+	ACT_COVER_LOW,				// FIXME: rename ACT_IDLE_CROUCH?
+	ACT_WALK,
+	ACT_WALK_AIM,
+	ACT_WALK_CROUCH,
+	ACT_WALK_CROUCH_AIM,
+	ACT_RUN,
+	ACT_RUN_AIM,
+	ACT_RUN_CROUCH,
+	ACT_RUN_CROUCH_AIM,
+	ACT_RUN_PROTECTED,
+	ACT_SCRIPT_CUSTOM_MOVE,
+	ACT_RANGE_ATTACK1,
+	ACT_RANGE_ATTACK2,
+	ACT_RANGE_ATTACK1_LOW,		// FIXME: not used yet, crouched versions of the range attack
+	ACT_RANGE_ATTACK2_LOW,		// FIXME: not used yet, crouched versions of the range attack
+	ACT_DIESIMPLE,
+	ACT_DIEBACKWARD,
+	ACT_DIEFORWARD,
+	ACT_DIEVIOLENT,
+	ACT_DIERAGDOLL,
+	ACT_FLY,				// Fly (and flap if appropriate)
+	ACT_HOVER,
+	ACT_GLIDE,
+	ACT_SWIM,
+	ACT_JUMP,
+	ACT_HOP,				// vertical jump
+	ACT_LEAP,				// long forward jump
+	ACT_LAND,
+	ACT_CLIMB_UP,
+	ACT_CLIMB_DOWN,
+	ACT_CLIMB_DISMOUNT,
+	ACT_SHIPLADDER_UP,
+	ACT_SHIPLADDER_DOWN,
+	ACT_STRAFE_LEFT,
+	ACT_STRAFE_RIGHT,
+	ACT_ROLL_LEFT,			// tuck and roll, left
+	ACT_ROLL_RIGHT,			// tuck and roll, right
+	ACT_TURN_LEFT,			// turn quickly left (stationary)
+	ACT_TURN_RIGHT,			// turn quickly right (stationary)
+	ACT_CROUCH,				// FIXME: obsolete? only used be soldier (the act of crouching down from a standing position)
+	ACT_CROUCHIDLE,			// FIXME: obsolete? only used be soldier (holding body in crouched position (loops))
+	ACT_STAND,				// FIXME: obsolete? should be transition (the act of standing from a crouched position)
+	ACT_USE,
+	ACT_SIGNAL1,
+	ACT_SIGNAL2,
+	ACT_SIGNAL3,
+
+	ACT_SIGNAL_ADVANCE,		// Squad handsignals, specific.
+	ACT_SIGNAL_FORWARD,
+	ACT_SIGNAL_GROUP,
+	ACT_SIGNAL_HALT,
+	ACT_SIGNAL_LEFT,
+	ACT_SIGNAL_RIGHT,
+	ACT_SIGNAL_TAKECOVER,
+
+	ACT_LOOKBACK_RIGHT,		// look back over shoulder without turning around.
+	ACT_LOOKBACK_LEFT,
+	ACT_COWER,				// FIXME: unused, should be more extreme version of crouching
+	ACT_SMALL_FLINCH,		// FIXME: needed? shouldn't flinching be down with overlays?
+	ACT_BIG_FLINCH,		
+	ACT_MELEE_ATTACK1,
+	ACT_MELEE_ATTACK2,
+	ACT_RELOAD,
+	ACT_RELOAD_START,
+	ACT_RELOAD_FINISH,
+	ACT_RELOAD_LOW,
+	ACT_ARM,				// pull out gun, for instance
+	ACT_DISARM,				// reholster gun
+	ACT_DROP_WEAPON,
+	ACT_DROP_WEAPON_SHOTGUN,
+	ACT_PICKUP_GROUND,		// pick up something in front of you on the ground
+	ACT_PICKUP_RACK,		// pick up something from a rack or shelf in front of you.
+	ACT_IDLE_ANGRY,			// FIXME: being used as an combat ready idle?  alternate idle animation in which the monster is clearly agitated. (loop)
+
+	ACT_IDLE_RELAXED,
+	ACT_IDLE_STIMULATED,
+	ACT_IDLE_AGITATED,
+	ACT_IDLE_STEALTH,
+	ACT_IDLE_HURT,
+
+	ACT_WALK_RELAXED,
+	ACT_WALK_STIMULATED,
+	ACT_WALK_AGITATED,
+	ACT_WALK_STEALTH,
+
+	ACT_RUN_RELAXED,
+	ACT_RUN_STIMULATED,
+	ACT_RUN_AGITATED,
+	ACT_RUN_STEALTH,
+		
+	ACT_IDLE_AIM_RELAXED,
+	ACT_IDLE_AIM_STIMULATED,
+	ACT_IDLE_AIM_AGITATED,
+	ACT_IDLE_AIM_STEALTH,
+
+	ACT_WALK_AIM_RELAXED,
+	ACT_WALK_AIM_STIMULATED,
+	ACT_WALK_AIM_AGITATED,
+	ACT_WALK_AIM_STEALTH,
+
+	ACT_RUN_AIM_RELAXED,
+	ACT_RUN_AIM_STIMULATED,
+	ACT_RUN_AIM_AGITATED,
+	ACT_RUN_AIM_STEALTH,
+
+	ACT_CROUCHIDLE_STIMULATED,
+	ACT_CROUCHIDLE_AIM_STIMULATED,
+	ACT_CROUCHIDLE_AGITATED,
+
+	ACT_WALK_HURT,			// limp  (loop)
+	ACT_RUN_HURT,			// limp  (loop)
+	ACT_SPECIAL_ATTACK1,	// very monster specific special attacks.
+	ACT_SPECIAL_ATTACK2,	
+	ACT_COMBAT_IDLE,		// FIXME: unused?  agitated idle.
+	ACT_WALK_SCARED,
+	ACT_RUN_SCARED,
+	ACT_VICTORY_DANCE,		// killed a player, do a victory dance.
+	ACT_DIE_HEADSHOT,		// die, hit in head. 
+	ACT_DIE_CHESTSHOT,		// die, hit in chest
+	ACT_DIE_GUTSHOT,		// die, hit in gut
+	ACT_DIE_BACKSHOT,		// die, hit in back
+	ACT_FLINCH_HEAD,
+	ACT_FLINCH_CHEST,
+	ACT_FLINCH_STOMACH,
+	ACT_FLINCH_LEFTARM,
+	ACT_FLINCH_RIGHTARM,
+	ACT_FLINCH_LEFTLEG,
+	ACT_FLINCH_RIGHTLEG,
+	ACT_FLINCH_PHYSICS,
+
+	ACT_IDLE_ON_FIRE,		// ON FIRE animations
+	ACT_WALK_ON_FIRE,
+	ACT_RUN_ON_FIRE,		
+
+	ACT_RAPPEL_LOOP,		// Rappel down a rope!
+
+	ACT_180_LEFT,			// 180 degree left turn
+	ACT_180_RIGHT,
+
+	ACT_90_LEFT,			// 90 degree turns
+	ACT_90_RIGHT,
+
+	ACT_STEP_LEFT,			// Single steps
+	ACT_STEP_RIGHT,
+	ACT_STEP_BACK,
+	ACT_STEP_FORE,
+
+	ACT_GESTURE_RANGE_ATTACK1,
+	ACT_GESTURE_RANGE_ATTACK2,
+	ACT_GESTURE_MELEE_ATTACK1,
+	ACT_GESTURE_MELEE_ATTACK2,
+	ACT_GESTURE_RANGE_ATTACK1_LOW,	// FIXME: not used yet, crouched versions of the range attack
+	ACT_GESTURE_RANGE_ATTACK2_LOW,	// FIXME: not used yet, crouched versions of the range attack
+
+	ACT_MELEE_ATTACK_SWING_GESTURE,
+
+	ACT_GESTURE_SMALL_FLINCH,
+	ACT_GESTURE_BIG_FLINCH,
+	ACT_GESTURE_FLINCH_BLAST,			// Startled by an explosion
+	ACT_GESTURE_FLINCH_BLAST_SHOTGUN,
+	ACT_GESTURE_FLINCH_BLAST_DAMAGED,	// Damaged by an explosion
+	ACT_GESTURE_FLINCH_BLAST_DAMAGED_SHOTGUN,
+	ACT_GESTURE_FLINCH_HEAD,
+	ACT_GESTURE_FLINCH_CHEST,
+	ACT_GESTURE_FLINCH_STOMACH,
+	ACT_GESTURE_FLINCH_LEFTARM,
+	ACT_GESTURE_FLINCH_RIGHTARM,
+	ACT_GESTURE_FLINCH_LEFTLEG,
+	ACT_GESTURE_FLINCH_RIGHTLEG,
+
+	ACT_GESTURE_TURN_LEFT,
+	ACT_GESTURE_TURN_RIGHT,
+	ACT_GESTURE_TURN_LEFT45,
+	ACT_GESTURE_TURN_RIGHT45,
+	ACT_GESTURE_TURN_LEFT90,
+	ACT_GESTURE_TURN_RIGHT90,
+	ACT_GESTURE_TURN_LEFT45_FLAT,
+	ACT_GESTURE_TURN_RIGHT45_FLAT,
+	ACT_GESTURE_TURN_LEFT90_FLAT,
+	ACT_GESTURE_TURN_RIGHT90_FLAT,
+
+	// HALF-LIFE 1 compatability stuff goes here. Temporary!
+	ACT_BARNACLE_HIT,		// barnacle tongue hits a monster
+	ACT_BARNACLE_PULL,		// barnacle is lifting the monster ( loop )
+	ACT_BARNACLE_CHOMP,		// barnacle latches on to the monster
+	ACT_BARNACLE_CHEW,		// barnacle is holding the monster in its mouth ( loop )
+
+	// Sometimes, you just want to set an NPC's sequence to a sequence that doesn't actually
+	// have an activity. The AI will reset the NPC's sequence to whatever its IDEAL activity
+	// is, though. So if you set ideal activity to DO_NOT_DISTURB, the AI will not interfere
+	// with the NPC's current sequence. (SJB)
+	ACT_DO_NOT_DISTURB,
+
+	// viewmodel (weapon) activities
+	// FIXME: move these to the specific viewmodels, no need to make global
+	ACT_VM_DRAW,
+	ACT_VM_HOLSTER,
+	ACT_VM_IDLE,
+	ACT_VM_FIDGET,
+	ACT_VM_PULLBACK,
+	ACT_VM_PULLBACK_HIGH,
+	ACT_VM_PULLBACK_LOW,
+	ACT_VM_THROW,
+	ACT_VM_PULLPIN,
+	ACT_VM_PRIMARYATTACK,		// fire
+	ACT_VM_SECONDARYATTACK,		// alt. fire
+	ACT_VM_RELOAD,			
+	ACT_VM_RELOAD_START,			
+	ACT_VM_RELOAD_FINISH,			
+	ACT_VM_DRYFIRE,				// fire with no ammo loaded.
+	ACT_VM_HITLEFT,				// bludgeon, swing to left - hit (primary attk)
+	ACT_VM_HITLEFT2,			// bludgeon, swing to left - hit (secondary attk)
+	ACT_VM_HITRIGHT,			// bludgeon, swing to right - hit (primary attk)
+	ACT_VM_HITRIGHT2,			// bludgeon, swing to right - hit (secondary attk)
+	ACT_VM_HITCENTER,			// bludgeon, swing center - hit (primary attk)
+	ACT_VM_HITCENTER2,			// bludgeon, swing center - hit (secondary attk)
+	ACT_VM_MISSLEFT,			// bludgeon, swing to left - miss (primary attk)
+	ACT_VM_MISSLEFT2,			// bludgeon, swing to left - miss (secondary attk)
+	ACT_VM_MISSRIGHT,			// bludgeon, swing to right - miss (primary attk)
+	ACT_VM_MISSRIGHT2,			// bludgeon, swing to right - miss (secondary attk)
+	ACT_VM_MISSCENTER,			// bludgeon, swing center - miss (primary attk)
+	ACT_VM_MISSCENTER2,			// bludgeon, swing center - miss (secondary attk)
+	ACT_VM_HAULBACK,			// bludgeon, haul the weapon back for a hard strike (secondary attk)
+	ACT_VM_SWINGHARD,			// bludgeon, release the hard strike (secondary attk)
+	ACT_VM_SWINGMISS,
+	ACT_VM_SWINGHIT,
+	ACT_VM_IDLE_TO_LOWERED,
+	ACT_VM_IDLE_LOWERED,
+	ACT_VM_LOWERED_TO_IDLE,
+	ACT_VM_RECOIL1,
+	ACT_VM_RECOIL2,
+	ACT_VM_RECOIL3,
+	ACT_VM_PICKUP,
+	ACT_VM_RELEASE,
+
+//===========================
+// HL2 Specific Activities
+//===========================
+	// SLAM	Specialty Activities
+	ACT_SLAM_STICKWALL_IDLE,
+	ACT_SLAM_STICKWALL_ND_IDLE,
+	ACT_SLAM_STICKWALL_ATTACH,
+	ACT_SLAM_STICKWALL_ATTACH2,
+	ACT_SLAM_STICKWALL_ND_ATTACH,
+	ACT_SLAM_STICKWALL_ND_ATTACH2,
+	ACT_SLAM_STICKWALL_DETONATE,
+	ACT_SLAM_STICKWALL_DETONATOR_HOLSTER,
+	ACT_SLAM_STICKWALL_DRAW,
+	ACT_SLAM_STICKWALL_ND_DRAW,
+	ACT_SLAM_STICKWALL_TO_THROW,
+	ACT_SLAM_STICKWALL_TO_THROW_ND,
+	ACT_SLAM_STICKWALL_TO_TRIPMINE_ND,
+	ACT_SLAM_THROW_IDLE,
+	ACT_SLAM_THROW_ND_IDLE,
+	ACT_SLAM_THROW_THROW,
+	ACT_SLAM_THROW_THROW2,
+	ACT_SLAM_THROW_THROW_ND,
+	ACT_SLAM_THROW_THROW_ND2,
+	ACT_SLAM_THROW_DRAW,
+	ACT_SLAM_THROW_ND_DRAW,
+	ACT_SLAM_THROW_TO_STICKWALL,
+	ACT_SLAM_THROW_TO_STICKWALL_ND,
+	ACT_SLAM_THROW_DETONATE,
+	ACT_SLAM_THROW_DETONATOR_HOLSTER,
+	ACT_SLAM_THROW_TO_TRIPMINE_ND,
+	ACT_SLAM_TRIPMINE_IDLE,
+	ACT_SLAM_TRIPMINE_DRAW,
+	ACT_SLAM_TRIPMINE_ATTACH,
+	ACT_SLAM_TRIPMINE_ATTACH2,
+	ACT_SLAM_TRIPMINE_TO_STICKWALL_ND,
+	ACT_SLAM_TRIPMINE_TO_THROW_ND,
+	ACT_SLAM_DETONATOR_IDLE,
+	ACT_SLAM_DETONATOR_DRAW,
+	ACT_SLAM_DETONATOR_DETONATE,
+	ACT_SLAM_DETONATOR_HOLSTER,
+	ACT_SLAM_DETONATOR_STICKWALL_DRAW,
+	ACT_SLAM_DETONATOR_THROW_DRAW,
+
+	// Shotgun Specialty Activities
+	ACT_SHOTGUN_RELOAD_START,
+	ACT_SHOTGUN_RELOAD_FINISH,
+	ACT_SHOTGUN_PUMP,
+#ifdef DARKINTERVAL
+	// Crossbow
+	ACT_CROSSBOW_DRAW_UNLOADED,
+	ACT_CROSSBOW_IDLE_UNLOADED,
+	ACT_CROSSBOW_FIDGET_UNLOADED,
+#endif
+	// SMG2 special activities
+	ACT_SMG2_IDLE2,
+	ACT_SMG2_FIRE2,
+	ACT_SMG2_DRAW2,
+	ACT_SMG2_RELOAD2,
+	ACT_SMG2_DRYFIRE2,
+	ACT_SMG2_TOAUTO,
+	ACT_SMG2_TOBURST,
+	
+	// Physcannon special activities
+	ACT_PHYSCANNON_UPGRADE,
+
+	// weapon override activities
+	ACT_RANGE_ATTACK_AR1,
+	ACT_RANGE_ATTACK_AR2,
+	ACT_RANGE_ATTACK_AR2_LOW,
+	ACT_RANGE_ATTACK_AR2_GRENADE,
+	ACT_RANGE_ATTACK_HMG1,
+	ACT_RANGE_ATTACK_ML,
+	ACT_RANGE_ATTACK_SMG1,
+	ACT_RANGE_ATTACK_SMG1_LOW,
+	ACT_RANGE_ATTACK_SMG2,
+	ACT_RANGE_ATTACK_SHOTGUN,
+	ACT_RANGE_ATTACK_SHOTGUN_LOW,
+	ACT_RANGE_ATTACK_PISTOL,
+	ACT_RANGE_ATTACK_PISTOL_LOW,
+	ACT_RANGE_ATTACK_SLAM,
+	ACT_RANGE_ATTACK_TRIPWIRE,
+	ACT_RANGE_ATTACK_THROW,
+	ACT_RANGE_ATTACK_SNIPER_RIFLE,
+	ACT_RANGE_ATTACK_RPG,
+	ACT_MELEE_ATTACK_SWING,
+
+	ACT_RANGE_AIM_LOW,
+	ACT_RANGE_AIM_SMG1_LOW,
+	ACT_RANGE_AIM_PISTOL_LOW,
+	ACT_RANGE_AIM_AR2_LOW,
+
+	ACT_COVER_PISTOL_LOW,
+	ACT_COVER_SMG1_LOW,
+
+	// weapon override activities
+	ACT_GESTURE_RANGE_ATTACK_AR1,
+	ACT_GESTURE_RANGE_ATTACK_AR2,
+	ACT_GESTURE_RANGE_ATTACK_AR2_GRENADE,
+	ACT_GESTURE_RANGE_ATTACK_HMG1,
+	ACT_GESTURE_RANGE_ATTACK_ML,
+	ACT_GESTURE_RANGE_ATTACK_SMG1,
+	ACT_GESTURE_RANGE_ATTACK_SMG1_LOW,
+	ACT_GESTURE_RANGE_ATTACK_SMG2,
+	ACT_GESTURE_RANGE_ATTACK_SHOTGUN,
+	ACT_GESTURE_RANGE_ATTACK_PISTOL,
+	ACT_GESTURE_RANGE_ATTACK_PISTOL_LOW,
+	ACT_GESTURE_RANGE_ATTACK_SLAM,
+	ACT_GESTURE_RANGE_ATTACK_TRIPWIRE,
+	ACT_GESTURE_RANGE_ATTACK_THROW,
+	ACT_GESTURE_RANGE_ATTACK_SNIPER_RIFLE,
+	ACT_GESTURE_MELEE_ATTACK_SWING,
+
+	ACT_IDLE_RIFLE,
+	ACT_IDLE_SMG1,
+	ACT_IDLE_ANGRY_SMG1,
+	ACT_IDLE_PISTOL,
+	ACT_IDLE_ANGRY_PISTOL,
+	ACT_IDLE_ANGRY_SHOTGUN,
+	ACT_IDLE_STEALTH_PISTOL,
+
+	ACT_IDLE_PACKAGE,
+	ACT_WALK_PACKAGE,
+	ACT_IDLE_SUITCASE,
+	ACT_WALK_SUITCASE,
+
+	ACT_IDLE_SMG1_RELAXED,
+	ACT_IDLE_SMG1_STIMULATED,
+	ACT_WALK_RIFLE_RELAXED,
+	ACT_RUN_RIFLE_RELAXED,
+	ACT_WALK_RIFLE_STIMULATED,
+	ACT_RUN_RIFLE_STIMULATED,
+
+	ACT_IDLE_AIM_RIFLE_STIMULATED,
+	ACT_WALK_AIM_RIFLE_STIMULATED,
+	ACT_RUN_AIM_RIFLE_STIMULATED,
+
+	ACT_IDLE_SHOTGUN_RELAXED,
+	ACT_IDLE_SHOTGUN_STIMULATED,
+	ACT_IDLE_SHOTGUN_AGITATED,
+
+	// Policing activities
+	ACT_WALK_ANGRY,
+	ACT_POLICE_HARASS1,
+	ACT_POLICE_HARASS2,
+
+	// Manned guns
+	ACT_IDLE_MANNEDGUN,
+		
+	// Melee weapon
+	ACT_IDLE_MELEE,
+	ACT_IDLE_ANGRY_MELEE,
+
+	// RPG activities
+	ACT_IDLE_RPG_RELAXED,
+	ACT_IDLE_RPG, 
+	ACT_IDLE_ANGRY_RPG,
+	ACT_COVER_LOW_RPG, 
+	ACT_WALK_RPG,
+	ACT_RUN_RPG, 
+	ACT_WALK_CROUCH_RPG, 
+	ACT_RUN_CROUCH_RPG, 
+	ACT_WALK_RPG_RELAXED, 
+	ACT_RUN_RPG_RELAXED, 
+
+	ACT_WALK_RIFLE,
+	ACT_WALK_AIM_RIFLE,
+	ACT_WALK_CROUCH_RIFLE,
+	ACT_WALK_CROUCH_AIM_RIFLE,
+	ACT_RUN_RIFLE,
+	ACT_RUN_AIM_RIFLE,
+	ACT_RUN_CROUCH_RIFLE,
+	ACT_RUN_CROUCH_AIM_RIFLE,
+	ACT_RUN_STEALTH_PISTOL,
+
+	ACT_WALK_AIM_SHOTGUN,
+	ACT_RUN_AIM_SHOTGUN,
+
+	ACT_WALK_PISTOL,
+	ACT_RUN_PISTOL,
+	ACT_WALK_AIM_PISTOL,
+	ACT_RUN_AIM_PISTOL,
+	ACT_WALK_STEALTH_PISTOL,
+	ACT_WALK_AIM_STEALTH_PISTOL,
+	ACT_RUN_AIM_STEALTH_PISTOL,
+
+	// Reloads
+	ACT_RELOAD_PISTOL,
+	ACT_RELOAD_PISTOL_LOW,
+	ACT_RELOAD_SMG1,
+	ACT_RELOAD_SMG1_LOW,
+	ACT_RELOAD_SHOTGUN,
+	ACT_RELOAD_SHOTGUN_LOW,
+
+	ACT_GESTURE_RELOAD,
+	ACT_GESTURE_RELOAD_PISTOL,
+	ACT_GESTURE_RELOAD_SMG1,
+	ACT_GESTURE_RELOAD_SHOTGUN,
+
+	// Busy animations
+	ACT_BUSY_LEAN_LEFT,
+	ACT_BUSY_LEAN_LEFT_ENTRY,
+	ACT_BUSY_LEAN_LEFT_EXIT,
+	ACT_BUSY_LEAN_BACK,
+	ACT_BUSY_LEAN_BACK_ENTRY,
+	ACT_BUSY_LEAN_BACK_EXIT,
+	ACT_BUSY_SIT_GROUND,
+	ACT_BUSY_SIT_GROUND_ENTRY,
+	ACT_BUSY_SIT_GROUND_EXIT,
+	ACT_BUSY_SIT_CHAIR,
+	ACT_BUSY_SIT_CHAIR_ENTRY,
+	ACT_BUSY_SIT_CHAIR_EXIT,
+	ACT_BUSY_STAND,
+	ACT_BUSY_QUEUE,
+#ifdef DARKINTERVAL
+	ACT_BUSY_THREAT, // used by critters before player enters hostility radius
+#endif
+	// Dodge animations
+	ACT_DUCK_DODGE,
+
+	// For NPCs being lifted/eaten by barnacles:
+	// being swallowed by a barnacle
+	ACT_DIE_BARNACLE_SWALLOW,  
+	 // being lifted by a barnacle
+	ACT_GESTURE_BARNACLE_STRANGLE, 
+
+	ACT_PHYSCANNON_DETACH,	// An activity to be played if we're picking this up with the physcannon
+	ACT_PHYSCANNON_ANIMATE, // An activity to be played by an object being picked up with the physcannon, but has different behavior to DETACH
+	ACT_PHYSCANNON_ANIMATE_PRE,	// An activity to be played by an object being picked up with the physcannon, before playing the ACT_PHYSCANNON_ANIMATE
+	ACT_PHYSCANNON_ANIMATE_POST,// An activity to be played by an object being picked up with the physcannon, after playing the ACT_PHYSCANNON_ANIMATE
+
+	ACT_DIE_FRONTSIDE,
+	ACT_DIE_RIGHTSIDE,
+	ACT_DIE_BACKSIDE,
+	ACT_DIE_LEFTSIDE,
+
+	ACT_OPEN_DOOR,
+
+	// Dynamic interactions
+	ACT_DI_ALYX_ZOMBIE_MELEE,
+	ACT_DI_ALYX_ZOMBIE_TORSO_MELEE,
+	ACT_DI_ALYX_HEADCRAB_MELEE,
+	ACT_DI_ALYX_ANTLION,
+
+	ACT_DI_ALYX_ZOMBIE_SHOTGUN64,
+	ACT_DI_ALYX_ZOMBIE_SHOTGUN26,
+
+	ACT_READINESS_RELAXED_TO_STIMULATED,
+	ACT_READINESS_RELAXED_TO_STIMULATED_WALK,
+	ACT_READINESS_AGITATED_TO_STIMULATED,
+	ACT_READINESS_STIMULATED_TO_RELAXED,
+
+	ACT_READINESS_PISTOL_RELAXED_TO_STIMULATED,
+	ACT_READINESS_PISTOL_RELAXED_TO_STIMULATED_WALK,
+	ACT_READINESS_PISTOL_AGITATED_TO_STIMULATED,
+	ACT_READINESS_PISTOL_STIMULATED_TO_RELAXED,
+
+	ACT_IDLE_CARRY,
+	ACT_WALK_CARRY,
+
+#ifdef DARKINTERVAL
+	ACT_IDLE_CARRY2, // used by Eli at the moment - regular carry for the flashlight, carry2 for gravity gun
+	ACT_WALK_CARRY2,
+
+// Taken from portalgun, currently unused,
+// but may prove useful later
+	ACT_VM_FIZZLE,
+
+	// DI NEW: Live Ragdolls Experiment (inspired by Dark Messiah)
+	ACT_PUSH_RAGDOLL_WAIT_IDLE,
+#endif
+	// this is the end of the global activities, private per-monster activities start here.
+	LAST_SHARED_ACTIVITY,
+} Activity;
+
+#endif // AI_ACTIVITY_H
+

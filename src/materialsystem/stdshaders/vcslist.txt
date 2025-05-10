@@ -1,0 +1,3 @@
+..\..\..\game\hl2\shaders\fxc\flowmappedwater_vs20.vcs
+..\..\..\game\hl2\shaders\fxc\flowmappedwater_ps20.vcs
+..\..\..\game\hl2\shaders\fxc\flowmappedwater_ps20b.vcs

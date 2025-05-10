@@ -1,0 +1,96 @@
+//========== Copyright (c) Valve Corporation, All rights reserved. ==========//
+
+//	DYNAMIC: "DOWATERFOG"			"0..1"
+
+// Includes
+#include "common_vs_fxc.h"
+
+static const int g_FogType = DOWATERFOG;
+
+#define matWorldViewProjection cModelViewProj
+
+// Globals
+const float  g_flUVScale		: register( SHADER_SPECIFIC_CONST_0 );
+
+const float4x4 g_FlashlightWorldToTexture :  register( SHADER_SPECIFIC_CONST_6 );
+
+// Structs
+struct VS_INPUT
+{
+	float4 positionWS				: POSITION;
+	float3 vNormalWS				: NORMAL;
+	float2 texCoord					: TEXCOORD0;
+	float3 vBinormalWS				: BINORMAL;
+	float3 vTangentWS				: TANGENT;
+	float2 vLightmapTexCoord		: TEXCOORD1;
+	float2 vLightmapTexCoordOffset	: TEXCOORD2;
+};
+
+struct VS_OUTPUT
+{
+	float4 position          : POSITION;	// proj-space position
+	float2 texCoord          : TEXCOORD0;
+	float3 vViewTS           : TEXCOORD1;   // view vector in tangent space, denormalized
+	float3 vNormalWS         : TEXCOORD2;   // Normal vector in world space
+	float3 vViewWS           : TEXCOORD3;   // View vector in world space	
+	HALF4 lightmapTexCoord1And2	: TEXCOORD4;
+	HALF4 lightmapTexCoord3		: TEXCOORD5;
+	float4 worldPos_projPosZ	: TEXCOORD6;
+	float  fog					: FOG;
+	float4 fogFactorW			: COLOR1;
+};
+
+
+// Main
+VS_OUTPUT main( const VS_INPUT i )
+{
+	VS_OUTPUT Out = (VS_OUTPUT) 0;
+
+	// Transform and output input position 
+	float4 position;
+	position = mul( float4( i.positionWS.xyz, 1 ), cModelViewProj );
+	Out.position = position;
+	position.z = dot( float4( i.positionWS.xyz, 1 ), cModelViewProjZ );
+
+	// Propagate texture coordinate through:
+	Out.texCoord = i.texCoord; 
+		
+	// Propagate the world vertex normal through:   
+	Out.vNormalWS = i.vNormalWS;
+
+	// Compute and output the world view vector:
+	float3 vViewWS = cEyePos - i.positionWS;
+	Out.vViewWS = vViewWS;
+
+	// Compute denormalized light vector in world space:
+	float3 vLightWS = vLightPosition - i.positionWS;
+
+	// Normalize the light and view vectors and transform it to the tangent space:
+	float3x3 mWorldToTangent = float3x3( i.vTangentWS, i.vBinormalWS, i.vNormalWS );
+
+	// Propagate the view and the light vectors (in tangent space):
+	Out.vViewTS  = mul( mWorldToTangent, vViewWS  );
+	
+	// Ambient light
+	Out.vAmbient = AmbientLight( vWorldNormal );
+		
+	// Lightmap functionality - coords to sample the lightmap by
+	Out.lightmapTexCoord1And2.xy = i.vLightmapTexCoord + i.vLightmapTexCoordOffset;
+
+	float2 lightmapTexCoord2 = Out.lightmapTexCoord1And2.xy + i.vLightmapTexCoordOffset;
+	float2 lightmapTexCoord3 = lightmapTexCoord2 + i.vLightmapTexCoordOffset;
+
+	// reversed component order
+	Out.lightmapTexCoord1And2.w = lightmapTexCoord2.x;
+	Out.lightmapTexCoord1And2.z = lightmapTexCoord2.y;
+	Out.lightmapTexCoord3.xy = lightmapTexCoord3;
+
+	// Fog functionality
+	Out.worldPos_projPosZ.w = position.z;
+	Out.worldPos_projPosZ.xyz = mul( float4( i.positionWS.xyz, 1 ), cModel[0] );
+	
+	Out.fogFactorW = CalcFog( Out.worldPos_projPosZ.xyz, position, g_FogType );
+	Out.fog = Out.fogFactorW;
+
+	return Out;
+}

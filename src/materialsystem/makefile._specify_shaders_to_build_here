@@ -1,0 +1,22 @@
+default:  fxctmp9_tmp\foliage_ps20b.inc shaders\fxc\foliage_ps20b.vcs fxctmp9_tmp\foliage_vs20.inc shaders\fxc\foliage_vs20.vcs
+
+fxctmp9_tmp\foliage_ps20b.inc shaders\fxc\foliage_ps20b.vcs: foliage_ps20b.fxc common_ps_fxc.h common_flashlight_fxc.h common_fxc.h shader_constant_register_map.h common_pragmas.h common_hlsl_cpp_consts.h common_vertexlitgeneric_dx9.h
+	perl ..\..\devtools\bin\fxc_prep.pl   -source "..\.." foliage_ps20b.fxc-----foliage_ps20b
+	echo foliage_ps20b.fxc>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_flashlight_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo shader_constant_register_map.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+
+fxctmp9_tmp\foliage_vs20.inc shaders\fxc\foliage_vs20.vcs: foliage_vs20.fxc common_fxc.h tree_sway.h common_hlsl_cpp_consts.h common_vs_fxc.h common_pragmas.h
+	perl ..\..\devtools\bin\fxc_prep.pl   -source "..\.." foliage_vs20.fxc-----foliage_vs20
+	echo foliage_vs20.fxc>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo tree_sway.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+

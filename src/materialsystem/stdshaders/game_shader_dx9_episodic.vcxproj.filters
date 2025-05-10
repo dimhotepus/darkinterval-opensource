@@ -1,0 +1,418 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{1680C80B-FF1E-EA4D-9817-CC12254F2E40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Link Libraries">
+      <UniqueIdentifier>{C5D73B3A-C648-896C-B7CE-F174808E5BA5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Source">
+      <UniqueIdentifier>{C6C1C1A8-80A2-218E-0AF8-94D8DDB5FAD8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Source\fxc">
+      <UniqueIdentifier>{4D918305-7063-E4C2-0906-D415E5F14EA3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{BA03E055-4FA2-FCE3-8A1C-D348547D379C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cloak">
+      <UniqueIdentifier>{52ba8918-a241-4ae7-8ee3-c02a80d02c6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Flesh Pass">
+      <UniqueIdentifier>{d8a61c19-7530-4155-9ce1-51990a05ff1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Refract">
+      <UniqueIdentifier>{badfc3ac-66a3-4b24-822c-0b2dd6f8f52b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Emissive Blend">
+      <UniqueIdentifier>{d95c474d-3d61-4543-bb4d-483ab352b715}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Phong">
+      <UniqueIdentifier>{f5754d94-65c5-4de6-9639-12432c8e8fe2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Lightmapped">
+      <UniqueIdentifier>{bdc4899e-052f-4249-850f-d8ddb30ee22f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Dof %28ASW version%29">
+      <UniqueIdentifier>{2c8389ff-59a0-4aee-886d-b2066232557c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\PostProcess">
+      <UniqueIdentifier>{13a89af9-7af5-43c4-9d77-d91d516067ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Aftershock">
+      <UniqueIdentifier>{a42f32b8-56d5-4957-b9bd-e85546d6cff0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Flowmapped Water">
+      <UniqueIdentifier>{1adf07f2-053c-413b-a45a-5c9b98f22a79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Subsurface Shader">
+      <UniqueIdentifier>{2d91ae29-5383-41d7-bf2f-02d8f89a6095}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\VertexLit">
+      <UniqueIdentifier>{effe39bf-cd9a-4237-8a0e-273b2ee66420}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Relief">
+      <UniqueIdentifier>{c6c937bd-455e-4886-b291-82675eee41ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Debug">
+      <UniqueIdentifier>{b20c4b84-127e-421b-9480-9db47ff84909}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shadow">
+      <UniqueIdentifier>{2862b44a-9d45-43a9-ac8f-e30e060a197c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Fog">
+      <UniqueIdentifier>{24aae854-8725-4764-b189-d7c98202116f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Screenspace">
+      <UniqueIdentifier>{874aa286-9d60-431a-b863-99b5b0afaea2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Sky">
+      <UniqueIdentifier>{bb135f87-d0a3-496f-8907-6107919f4aa2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\PBR">
+      <UniqueIdentifier>{236fd4b2-6621-4c92-945a-a558544d91f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cable">
+      <UniqueIdentifier>{65ef0d70-9549-4c8b-9d2f-e5a8a20c7e7c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\lib\public\mathlib.lib">
+      <Filter>Link Libraries</Filter>
+    </Library>
+    <Library Include="..\..\lib\public\shaderlib.lib">
+      <Filter>Link Libraries</Filter>
+    </Library>
+    <Library Include="..\..\lib\public\tier0.lib">
+      <Filter>Link Libraries</Filter>
+    </Library>
+    <Library Include="..\..\lib\public\tier1.lib">
+      <Filter>Link Libraries</Filter>
+    </Library>
+    <Library Include="..\..\lib\public\vstdlib.lib">
+      <Filter>Link Libraries</Filter>
+    </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BaseVSShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="common_fxc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="common_hlsl_cpp_consts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="common_ps_fxc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="common_vertexlitgeneric_dx9.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="common_vs_fxc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shader_constant_register_map.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cloak_blended_pass_helper.h">
+      <Filter>Source Files\Cloak</Filter>
+    </ClInclude>
+    <ClInclude Include="flesh_interior_blended_pass_helper.h">
+      <Filter>Source Files\Flesh Pass</Filter>
+    </ClInclude>
+    <ClInclude Include="refract_dx9_helper.h">
+      <Filter>Source Files\Refract</Filter>
+    </ClInclude>
+    <ClInclude Include="emissive_scroll_blended_pass_helper.h">
+      <Filter>Source Files\Emissive Blend</Filter>
+    </ClInclude>
+    <ClInclude Include="skin_dx9_helper.h">
+      <Filter>Source Files\Phong</Filter>
+    </ClInclude>
+    <ClInclude Include="vertexlitgeneric_dx9_helper.h">
+      <Filter>Source Files\VertexLit</Filter>
+    </ClInclude>
+    <ClInclude Include="aftershock_helper.h">
+      <Filter>Source Files\Aftershock</Filter>
+    </ClInclude>
+    <ClInclude Include="lightmappedgeneric_dx9_helper.h">
+      <Filter>Source Files\Lightmapped</Filter>
+    </ClInclude>
+    <ClInclude Include="lightmappedgeneric_ps2_3_x.h">
+      <Filter>Source Files\Lightmapped</Filter>
+    </ClInclude>
+    <ClInclude Include="common_parallax.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="common_flashlight_fxc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="subsurface_helper.h">
+      <Filter>Source Files\Subsurface Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="pbr_common_ps2_3_x.h">
+      <Filter>Source Files\PBR</Filter>
+    </ClInclude>
+    <ClInclude Include="foliage_dx9_helper.h">
+      <Filter>Source Files\VertexLit</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\public\tier0\memoverride.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cloak_blended_pass_helper.cpp">
+      <Filter>Source Files\Cloak</Filter>
+    </ClCompile>
+    <ClCompile Include="flesh_interior_blended_pass_helper.cpp">
+      <Filter>Source Files\Flesh Pass</Filter>
+    </ClCompile>
+    <ClCompile Include="refract.cpp">
+      <Filter>Source Files\Refract</Filter>
+    </ClCompile>
+    <ClCompile Include="refract_dx9_helper.cpp">
+      <Filter>Source Files\Refract</Filter>
+    </ClCompile>
+    <ClCompile Include="emissive_scroll_blended_pass_helper.cpp">
+      <Filter>Source Files\Emissive Blend</Filter>
+    </ClCompile>
+    <ClCompile Include="skin_dx9_helper.cpp">
+      <Filter>Source Files\Phong</Filter>
+    </ClCompile>
+    <ClCompile Include="di_lightmappedgeneric_dx9.cpp">
+      <Filter>Source Files\Lightmapped</Filter>
+    </ClCompile>
+    <ClCompile Include="vertexlitgeneric_dx9_helper.cpp">
+      <Filter>Source Files\VertexLit</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthOfField_dx9.cpp">
+      <Filter>Source Files\Dof %28ASW version%29</Filter>
+    </ClCompile>
+    <ClCompile Include="post_chromatic_aberration.cpp">
+      <Filter>Source Files\PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="post_vignette.cpp">
+      <Filter>Source Files\PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="post_colourfilter.cpp">
+      <Filter>Source Files\PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="aftershock.cpp">
+      <Filter>Source Files\Aftershock</Filter>
+    </ClCompile>
+    <ClCompile Include="aftershock_helper.cpp">
+      <Filter>Source Files\Aftershock</Filter>
+    </ClCompile>
+    <ClCompile Include="flowmappedwater.cpp">
+      <Filter>Source Files\Flowmapped Water</Filter>
+    </ClCompile>
+    <ClCompile Include="lightmappedgeneric_dx9_helper.cpp">
+      <Filter>Source Files\Lightmapped</Filter>
+    </ClCompile>
+    <ClCompile Include="post_cubicdistortion.cpp">
+      <Filter>Source Files\PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="post_psychedelic.cpp">
+      <Filter>Source Files\PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="di_vertexlitgeneric_dx9.cpp">
+      <Filter>Source Files\VertexLit</Filter>
+    </ClCompile>
+    <ClCompile Include="DecalModulate_dx9.cpp">
+      <Filter>Source Files\VertexLit</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseVSShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="debugluxel.cpp">
+      <Filter>Source Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="di_shadow.cpp">
+      <Filter>Source Files\Shadow</Filter>
+    </ClCompile>
+    <ClCompile Include="di_lightmapped_parallax.cpp">
+      <Filter>Source Files\Relief</Filter>
+    </ClCompile>
+    <ClCompile Include="di_vertexlit_parallax.cpp">
+      <Filter>Source Files\Relief</Filter>
+    </ClCompile>
+    <ClCompile Include="object_motion_blur_dx9.cpp">
+      <Filter>Source Files\PostProcess</Filter>
+    </ClCompile>
+    <ClCompile Include="subsurface_dx9.cpp">
+      <Filter>Source Files\Subsurface Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="subsurface_helper.cpp">
+      <Filter>Source Files\Subsurface Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="sky_hdr.cpp">
+      <Filter>Source Files\Sky</Filter>
+    </ClCompile>
+    <ClCompile Include="di_depthoffield.cpp">
+      <Filter>Source Files\Dof %28ASW version%29</Filter>
+    </ClCompile>
+    <ClCompile Include="pbr_brush_dx9.cpp">
+      <Filter>Source Files\PBR</Filter>
+    </ClCompile>
+    <ClCompile Include="pbr_model_dx9.cpp">
+      <Filter>Source Files\PBR</Filter>
+    </ClCompile>
+    <ClCompile Include="foliage_dx9.cpp">
+      <Filter>Source Files\VertexLit</Filter>
+    </ClCompile>
+    <ClCompile Include="foliage_dx9_helper.cpp">
+      <Filter>Source Files\VertexLit</Filter>
+    </ClCompile>
+    <ClCompile Include="di_cable_dx9.cpp">
+      <Filter>Source Files\Cable</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="di_WorldVertexAlpha_ps2x.fxc">
+      <Filter>Shader Source\fxc</Filter>
+    </None>
+    <None Include="flesh_interior_blended_pass_ps2x.fxc">
+      <Filter>Source Files\Flesh Pass</Filter>
+    </None>
+    <None Include="flesh_interior_blended_pass_vs20.fxc">
+      <Filter>Source Files\Flesh Pass</Filter>
+    </None>
+    <None Include="post_colourfilter_ps30.fxc">
+      <Filter>Source Files\PostProcess</Filter>
+    </None>
+    <None Include="lightmappedgeneric_ps2x.fxc">
+      <Filter>Source Files\Lightmapped</Filter>
+    </None>
+    <None Include="lightmappedgeneric_vs20.fxc">
+      <Filter>Source Files\Lightmapped</Filter>
+    </None>
+    <None Include="mapbase_decalmodulate_ps2x.fxc">
+      <Filter>Source Files\VertexLit</Filter>
+    </None>
+    <None Include="mapbase_decalmodulate_vs20.fxc">
+      <Filter>Source Files\VertexLit</Filter>
+    </None>
+    <None Include="di_cloak_blended_pass_ps2x.fxc">
+      <Filter>Source Files\Cloak</Filter>
+    </None>
+    <None Include="di_cloak_blended_pass_vs20.fxc">
+      <Filter>Source Files\Cloak</Filter>
+    </None>
+    <None Include="di_Refract_vs20.fxc">
+      <Filter>Source Files\Refract</Filter>
+    </None>
+    <None Include="di_refract_ps2x.fxc">
+      <Filter>Source Files\Refract</Filter>
+    </None>
+    <None Include="di_emissive_scroll_blended_pass_vs20.fxc">
+      <Filter>Source Files\Emissive Blend</Filter>
+    </None>
+    <None Include="di_emissive_scroll_blended_pass_ps2x.fxc">
+      <Filter>Source Files\Emissive Blend</Filter>
+    </None>
+    <None Include="di_shadow_ps2x.fxc">
+      <Filter>Source Files\Shadow</Filter>
+    </None>
+    <None Include="di_shadow_vs20.fxc">
+      <Filter>Source Files\Shadow</Filter>
+    </None>
+    <None Include="di_skin_ps20b.fxc">
+      <Filter>Source Files\Phong</Filter>
+    </None>
+    <None Include="di_skin_vs20.fxc">
+      <Filter>Source Files\Phong</Filter>
+    </None>
+    <None Include="di_lightmapped_parallax_vs30.fxc">
+      <Filter>Source Files\Relief</Filter>
+    </None>
+    <None Include="di_lightmapped_parallax_ps30.fxc">
+      <Filter>Source Files\Relief</Filter>
+    </None>
+    <None Include="flowmappedwater_ps2x.fxc">
+      <Filter>Source Files\Flowmapped Water</Filter>
+    </None>
+    <None Include="flowmappedWater_vs20.fxc">
+      <Filter>Source Files\Flowmapped Water</Filter>
+    </None>
+    <None Include="post_vignette_ps30.fxc">
+      <Filter>Source Files\PostProcess</Filter>
+    </None>
+    <None Include="object_motion_blur_ps2x.fxc">
+      <Filter>Source Files\PostProcess</Filter>
+    </None>
+    <None Include="object_motion_blur_vs20.fxc">
+      <Filter>Source Files\PostProcess</Filter>
+    </None>
+    <None Include="sky_hdr_ps20.fxc">
+      <Filter>Source Files\Sky</Filter>
+    </None>
+    <None Include="sky_hdr_vs20.fxc">
+      <Filter>Source Files\Sky</Filter>
+    </None>
+    <None Include="flesh_ps30.fxc">
+      <Filter>Source Files\Subsurface Shader</Filter>
+    </None>
+    <None Include="flesh_vs30.fxc">
+      <Filter>Source Files\Subsurface Shader</Filter>
+    </None>
+    <None Include="pbr_ps20b.fxc">
+      <Filter>Source Files\PBR</Filter>
+    </None>
+    <None Include="pbr_ps30.fxc">
+      <Filter>Source Files\PBR</Filter>
+    </None>
+    <None Include="pbr_vs20b.fxc">
+      <Filter>Source Files\PBR</Filter>
+    </None>
+    <None Include="pbr_vs30.fxc">
+      <Filter>Source Files\PBR</Filter>
+    </None>
+    <None Include="foliage_ps20b.fxc">
+      <Filter>Source Files\VertexLit</Filter>
+    </None>
+    <None Include="foliage_vs20.fxc">
+      <Filter>Source Files\VertexLit</Filter>
+    </None>
+    <None Include="di_cable_ps2x.fxc">
+      <Filter>Source Files\Cable</Filter>
+    </None>
+    <None Include="di_cable_vs20.fxc">
+      <Filter>Source Files\Cable</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="stdshader_dx9_20b.txt">
+      <Filter>Shader Source</Filter>
+    </CustomBuild>
+    <CustomBuild Include="example_model_ps20b.fxc">
+      <Filter>Shader Source\fxc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="example_model_vs20.fxc">
+      <Filter>Shader Source\fxc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SDK_Bloom_ps2x.fxc">
+      <Filter>Shader Source\fxc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SDK_bloomadd_ps2x.fxc">
+      <Filter>Shader Source\fxc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SDK_screenspaceeffect_vs20.fxc">
+      <Filter>Shader Source\fxc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\public\tier0\pointeroverride.asm">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="buildsdkshaders.bat">
+      <Filter>
+      </Filter>
+    </None>
+    <None Include="buildshaders.bat">
+      <Filter>
+      </Filter>
+    </None>
+  </ItemGroup>
+</Project>

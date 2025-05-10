@@ -1,0 +1,44 @@
+// DYNAMIC: "PIXELFOGTYPE"				"0..1"
+// DYNAMIC: "VISUALIZE_DOF"				"0..1"
+
+#include "shader_constant_register_map.h"
+#include "common_ps_fxc.h"
+
+sampler BaseTextureSampler		: register( s0 );
+
+sampler BlurredFrameSampler		: register( s1 );
+
+const float4 g_vDoFParms1		: register( c0 );
+	#define g_flDoFStartDistance	g_vDoFParms1.x
+	#define g_flDoFPower			g_vDoFParms1.y
+	#define g_flDoFMax				g_vDoFParms1.z
+	#define g_flUnused1				g_vDoFParms1.w
+	
+const HALF3 g_EyePos			: register( c8 );
+const HALF4 g_FogParams			: register( c11 );
+	
+
+struct PS_INPUT
+{
+	float2 vBaseTexCoord			: TEXCOORD0;
+};
+	
+float4 main( PS_INPUT i ) : COLOR
+{
+	float	flDepth = tex2D( BaseTextureSampler, i.vBaseTexCoord.xy ).a;
+	float4	vBaseColor = tex2D( BlurredFrameSampler, i.vBaseTexCoord.xy );
+
+
+	float flAmount;
+	flAmount = flDepth;
+	
+	flAmount = saturate( flDepth - g_flDoFStartDistance );
+	flAmount = pow( flAmount, g_flDoFPower );
+	flAmount *= g_flDoFMax;
+
+#if VISUALIZE_DOF == 1
+	return float4( 1, 0, 0, flAmount );
+#else
+	return float4( vBaseColor.rgb, flAmount );
+#endif
+}

@@ -1,0 +1,85 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# Executables
+*.out
+*.app
+
+# Extra folders and files
+ipch/
+obj/
+[Rr]elease_mod*/
+[Dd]ebug_mod*/
+*[Cc]ompiled_bin/
+[Ee]pisodic_shaders_dll/
+[Dd]ebug_shaders_dll/
+*[Dd]arkinterval_client_dll/
+*[Dd]arkinterval_server_dll/
+*.bin
+*.pdb
+
+# junk in Public
+public/dme_controls
+public/libWebmPlayer
+lib/public/matsys_controls_2013.lib
+
+*.db
+*.opendb
+*.tlog
+*.log
+*.user
+*.vcxproj.user
+*.vcproj.user
+*.exp
+
+.git/
+.vs/
+*.idb
+
+# no SLE, Scenemaker and ModelViewer in initial commits
+# Hammer/
+# Hammer_Launcher/
+hlmv/
+hlfaceposer/
+modelbrowser/
+
+# not needed
+vbsp/
+vrad/
+vrad_launcher/
+vvis/
+vvis_launcher/
+
+# no temp or compiled Shader files
+fxctmp9/
+
+# allow these, for modders' convenience
+# *.inc
+# materialsystem/stdshaders/shaders/
+
+[Dd]ebug_dx9_mod_episodic/
+[Dd]arkinterval_shaders_dll/
+*.sentinel

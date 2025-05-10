@@ -1,0 +1,60 @@
+#include "common_ps_fxc.h"
+ 
+sampler BaseTextureSampler : register( s0 );
+
+float	g_flBrightness					: register (c0);
+
+float	g_flTime						: register( c1 );
+
+float	g_flRadiusOuter					: register( c2 );
+
+float	g_flRadiusInner					: register( c3 );
+
+const HALF4 g_ColorDef					: register( c7 );
+
+const HALF4 g_Luminance					: register( c8 );
+
+float	g_flBlurAmount					: register( c9 );
+
+float4 main(float2 iTexCoord : TEXCOORD0) : COLOR
+{
+	float4 outColor = tex2D(BaseTextureSampler,iTexCoord);
+
+	float blur = 0.001 * g_flBlurAmount;
+
+	outColor += tex2D(BaseTextureSampler, iTexCoord.xy - blur);
+	outColor += tex2D(BaseTextureSampler, iTexCoord.xy + blur);
+
+	outColor = outColor / 3;
+
+//	float2 vUv0 = iTexCoord.xy * 10.0 + g_flTime;
+//	float2 vUv1 = iTexCoord.yx * 20.0 - g_flTime;
+//	float2 vNoiseTexelUv;
+
+//	float3 vTmp = { 0.2125f, 0.7154f, 0.0721f };
+	HALF3 vTmp = HALF3(1.0f, 1.0f, 1.0f);
+	vTmp *= g_Luminance;
+	float flLuminance = saturate( dot( outColor.rgb, vTmp.rgb ) );
+	
+	HALF3 colorDef = HALF3( 1.0f, 1.0f, 1.0f );
+	
+	colorDef *= g_ColorDef;
+	
+	outColor.r = colorDef[0] * flLuminance;
+	outColor.g = colorDef[1] * flLuminance; // * (outColor.r + outColor.g + outColor.b) / 3;
+	outColor.b = colorDef[2] * flLuminance;
+
+	float testBrightness = g_flBrightness;
+	if (outColor.r < 0.1 )
+	{
+	//	outColor.r += (0.08 * (testBrightness - 2.0) ) ;
+	}
+
+	outColor.rgb *= g_flBrightness;
+
+	 float dist = distance(iTexCoord.xy, float2(0.5,0.5));
+  	 float flVignette = smoothstep(g_flRadiusOuter, g_flRadiusInner, dist);	
+	 outColor.rgba *= flVignette;
+	
+	return outColor;
+} 	

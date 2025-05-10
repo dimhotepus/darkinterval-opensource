@@ -1,0 +1,25 @@
+#include "common_ps_fxc.h"
+
+sampler BaseTextureSampler : register(s0);
+sampler OutputTextureSampler : register(s1);
+float weight: register( c0 );
+float value: register( c1 );
+
+struct PS_INPUT
+{
+	float2 baseTexCoord : TEXCOORD0;
+};
+	
+float4 main( PS_INPUT i ) : COLOR
+{  
+	
+	float4 inputDistord = tex2D(BaseTextureSampler, float2(i.baseTexCoord.x, i.baseTexCoord.y));
+			
+	float4 cColor = float4( 0.0f, 0.0f, 0.0f, inputDistord.a );
+	
+	cColor.rgb = inputDistord * value;
+	
+	cColor.rgb += tex3D(OutputTextureSampler, inputDistord.rgb) * weight;
+					
+	return cColor;
+}

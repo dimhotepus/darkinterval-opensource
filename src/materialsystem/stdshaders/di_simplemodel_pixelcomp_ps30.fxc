@@ -1,0 +1,151 @@
+// STATIC: "CONVERT_TO_SRGB"			"0..0"
+// STATIC: "FLASHLIGHT"					"0..1"
+// STATIC: "FLASHLIGHTDEPTHFILTERMODE"	"0..2"
+
+// DYNAMIC: "WRITEWATERFOGTODESTALPHA"  "0..1"
+// DYNAMIC: "PIXELFOGTYPE"				"0..1"
+// DYNAMIC: "NUM_LIGHTS"				"0..4"
+// DYNAMIC: "WRITE_DEPTH_TO_DESTALPHA"	"0..1"
+// DYNAMIC: "FLASHLIGHTSHADOWS"			"0..1"
+
+// SKIP: ($PIXELFOGTYPE == 0) && ($WRITEWATERFOGTODESTALPHA != 0)
+
+// We don't care about flashlight depth unless the flashlight is on
+// SKIP: ( $FLASHLIGHT == 0 ) && ( $FLASHLIGHTSHADOWS == 1 )
+
+// Flashlight shadow filter mode is irrelevant if there is no flashlight
+// SKIP: ( $FLASHLIGHT == 0 ) && ( $FLASHLIGHTDEPTHFILTERMODE != 0 )
+
+#include "common_flashlight_fxc.h"
+#include "shader_constant_register_map.h"
+
+const float4 g_Parameters					: register( c0 );
+#define p_NormalStrength					g_Parameters.x
+#define p_NormalSoftness					g_Parameters.y
+
+const float4 g_DiffuseModulation			: register( PSREG_DIFFUSE_MODULATION );
+const float4 g_ShadowTweaks					: register( PSREG_ENVMAP_TINT__SHADOW_TWEAKS );
+const float3 cAmbientCube[6]				: register( PSREG_AMBIENT_CUBE );
+const float4 g_EyePos						: register( PSREG_EYEPOS_SPEC_EXPONENT );
+const float4 g_FogParams					: register( PSREG_FOG_PARAMS );
+const float4 g_FlashlightAttenuationFactors	: register( PSREG_FLASHLIGHT_ATTENUATION );			// On non-flashlight pass
+const float4 g_FlashlightPos_RimBoost		: register( PSREG_FLASHLIGHT_POSITION_RIM_BOOST );
+const float4x4 g_FlashlightWorldToTexture	: register( PSREG_FLASHLIGHT_TO_WORLD_TEXTURE );
+PixelShaderLightInfo cLightInfo[3]			: register( PSREG_LIGHT_INFO_ARRAY );				// 2 registers each - 6 registers total (4th light spread across w's)
+
+#define g_FlashlightPos					g_FlashlightPos_RimBoost.xyz
+
+sampler s_Base					: register( s0 );	// Base map, specular mask in alpha
+sampler s_Normal				: register( s1 );	// Normal Mapping
+sampler s_TMask					: register( s2 );   // Texture masks (envmap, selfillum)
+sampler s_EMask					: register( s3 );   // Effects masks (exponent, clearcoat)
+sampler s_NormaliseRandomRot	: register( s9 );	// Normalization / RandomRotation samplers
+sampler s_Flashlight			: register( s10 );	// Flashlight cookie
+sampler s_ShadowDepth			: register( s11 );	// Flashlight shadow depth map sampler
+sampler s_Detail				: register( s12 );  // Detail texture
+
+struct PS_INPUT
+{
+	float2 mainTexCoord				: TEXCOORD0;
+	float3 lightAtten				: TEXCOORD1;
+	float3 worldNormal				: TEXCOORD2;
+	float3 worldPos					: TEXCOORD3;
+	float4 worldTangent				: TEXCOORD4;
+	float3 projPos					: TEXCOORD5;
+	float4 worldPos_projPosZ		: TEXCOORD6;
+	float3 detailTexCoord_atten3	: TEXCOORD7;
+	float4 fogFactorW				: COLOR1;
+};
+
+float4 main( PS_INPUT i ) : COLOR
+{	
+	float3 vWorldBinormal = cross( i.worldNormal.xyz, i.worldTangent.xyz ) * i.worldTangent.w;
+	
+	// Unpack four light attenuations
+	float4 vLightAtten = float4( i.lightAtten, i.detailTexCoord_atten3.z );
+
+	// Base (albedo) map
+	float4 baseTex			= tex2D( s_Base, i.mainTexCoord.xy );
+	float3 baseColor		= baseTex.rgb;
+	float  baseAlpha		= baseTex.a;
+
+	// Normal mapping
+	float4 normalSampledFromTexture	= tex2D( s_Normal, i.mainTexCoord.xy );
+	float3 normalTangentCorrected = normalSampledFromTexture.xyz * 2.0f - 1.0f;
+	float3 normalWorldspaceCorrected = Vec3TangentToWorld( normalTangentCorrected, i.worldNormal, i.worldTangent, vWorldBinormal );
+	
+	normalWorldspaceCorrected = normalize( normalWorldspaceCorrected );
+
+//	float  flCurvature		= 1.0f - normalSampledFromTexture.a + 0.01;	// invert mask (makes more sense visually when white is high curvature) and
+														// make sure it is never zero (else divide by zero errors later)
+	// TODO: Masks
+	
+	// TODO: Detail
+
+	// TODO: Ambient boost
+
+	// Soft normals
+//	float3 vBumpedTangentNormal2 = vBumpedTangentNormal;
+//	float3 vBumpedWorldNormal2 = vBumpedWorldNormal;
+	
+//	float4 vNormal2		  = tex2Dbias( s_Normal, float4( i.mainTexCoord, 0, p_NormalSoftness ) );
+//	vBumpedTangentNormal2 = normalize( ( vNormal2.xyz * 2.0f - 1.0f ) * float3( p_NormalStrength, p_NormalStrength, 1.0f ) );
+//	vBumpedWorldNormal2 = BumpedToWorldNormal( vBumpedTangentNormal2, vWorldNormal, vWorldTangent, vWorldBinormal  );
+	
+	float3 diffuseLighting;
+	if ( FLASHLIGHT != 0 )
+	{
+		float4 flashlightSpacePosition = mul( float4( i.worldPos, 1.0f ), g_FlashlightWorldToTexture );
+
+		diffuseLighting = DoFlashlight( 
+		g_FlashlightPos, 
+		i.worldPos, 
+		flashlightSpacePosition,
+		normalWorldspaceCorrected, 
+		g_FlashlightAttenuationFactors.xyz, 
+		g_FlashlightAttenuationFactors.w, 
+		s_Flashlight, 
+		s_ShadowDepth,
+		s_NormaliseRandomRot, 
+		FLASHLIGHTDEPTHFILTERMODE, 
+		FLASHLIGHTSHADOWS, 
+		true, 
+		i.projPos, 
+		false, 
+		g_ShadowTweaks );
+	}
+	else // non-flashlight path
+	{
+		// Summation of diffuse illumination from all local lights
+		diffuseLighting = PixelShaderDoLighting( 
+		i.worldPos, 
+		normalWorldspaceCorrected,
+		float3( 0.0f, 0.0f, 0.0f ), 
+		false, 
+		true, 
+		vLightAtten,
+		cAmbientCube, 
+		s_NormaliseRandomRot, 
+		NUM_LIGHTS, 
+		cLightInfo, 
+		true,
+		// These are dummy parameters:
+		false, 
+		1.0f,
+		false, 
+		s_Base );
+	}
+
+	float3 result = baseColor.rgb * g_DiffuseModulation.rgb * diffuseLighting;
+	float alpha = g_DiffuseModulation.a * baseAlpha;
+
+	float fogFactor = CalcPixelFogFactor( PIXELFOGTYPE, g_FogParams, g_EyePos.z, i.worldPos.z, i.projPos.z );
+
+#if WRITEWATERFOGTODESTALPHA && ( PIXELFOGTYPE == PIXEL_FOG_TYPE_HEIGHT )
+	alpha = fogFactor;
+#endif
+
+	bool bWriteDepthToAlpha = ( WRITE_DEPTH_TO_DESTALPHA != 0 ) && ( WRITEWATERFOGTODESTALPHA == 0 );
+
+	return FinalOutput( float4( result, alpha ), fogFactor, PIXELFOGTYPE, TONEMAP_SCALE_LINEAR, bWriteDepthToAlpha, i.projPos.z );
+}

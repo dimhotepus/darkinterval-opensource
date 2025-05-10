@@ -1,0 +1,94 @@
+#include "common_ps_fxc.h"
+
+sampler BaseTextureSampler : register(s0);
+float distCoeff : register(c0);
+float cubeDistort : register(c1) ;
+float red : register(c2);
+float green : register(c3);
+float blue : register(c4);
+
+//float3 colorDistort;
+
+float4 main( float2 tex : TEXCOORD0 ) : COLOR0
+{
+//	distCoeff = -0.15;
+//	cubeDistort = 0.15;
+    float f = 0;
+    float r2 = (tex.x - 0.5) * (tex.x - 0.5) + (tex.y - 0.5) * (tex.y - 0.5);
+
+	float3 colorDistort;
+
+    // Only compute the cubic distortion if necessary.
+    if ( cubeDistort == 0.0 )
+        f = 1 + r2 * distCoeff;
+    else
+        f = 1 + r2 * (distCoeff + cubeDistort * sqrt(r2));
+		
+	colorDistort.x = red;
+	colorDistort.y = green;
+	colorDistort.z = blue;
+
+    // Distort each color channel seperately to get a chromatic distortion effect.
+    float3 outColor;
+    float3 distort = f.xxx + colorDistort;
+
+    for ( int i=0; i < 3; i++ )
+    {
+        float x = distort[i] * ( tex.x - 0.5 ) + 0.5;
+        float y = distort[i] * ( tex.y - 0.5 ) + 0.5;
+        outColor[i] = tex2D( BaseTextureSampler, float4(x,y,0,0) )[i];
+    }
+
+    return float4( outColor.rgb, 1 );
+}
+
+/*
+HALF4 main(float2 tex : TEXCOORD0) : COLOR
+{           
+	dist = 0.01;
+	
+	// lens distortion coefficient (between
+	k = -0.15;
+           
+	// cubic distortion value
+	kcube = 0.15;           
+           
+	float r2 = (tex.x-0.5) * (tex.x-0.5) + (tex.y-0.5) * (tex.y-0.5);       
+	float f = 0;
+           
+     
+	//only compute the cubic distortion if necessary
+	if( kcube == 0.0)
+	{
+		f = 1 + r2 * k;
+	}
+	else
+	{
+		f = 1 + r2 * (k + kcube * sqrt(r2));
+	};
+			
+           
+	// get the right pixel for the current position
+	float x = f*(tex.x-0.5)+0.5;
+	float y = f*(tex.y-0.5)+0.5;
+	float3 inputDistord = tex2D(BaseTextureSampler, float2(x,y));
+	
+	return cColor;
+          
+	//return float4(inputDistord.rgb,1);
+
+	//		float4 cColor;
+	//		cColor.r = inputDistord.r;
+	//		cColor.g = inputDistord.g;
+	//		cColor.b = inputDistord.b;
+	//		cColor.a = 1.0;
+
+	//		return cColor;			
+			
+	//		float4 cColor;
+	//		cColor.r = tex2D(BaseTextureSampler, inputDistord).r;
+	//		cColor.g = tex2D(BaseTextureSampler, inputDistord).g;
+	//		cColor.b = tex2D(BaseTextureSampler, inputDistord).b;
+	//		cColor.a = 1.0;
+}
+*/

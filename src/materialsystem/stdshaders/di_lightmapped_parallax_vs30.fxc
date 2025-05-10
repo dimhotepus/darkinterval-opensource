@@ -1,0 +1,131 @@
+//	STATIC: "DOTPRODUCTFIX"			"0..1"
+//	DYNAMIC: "DOWATERFOG"			"0..1"
+#include "common_vs_fxc.h"
+
+//---------------------------------------------------------------------------------//
+// Relief mapping algorithm implementation. Vertex shader.             
+//---------------------------------------------------------------------------------//
+
+static const int g_FogType = DOWATERFOG;
+
+#define matWorldViewProjection cModelViewProj
+
+float4   vLightPosition;
+
+const float cParallaxMapParams : register( SHADER_SPECIFIC_CONST_0 );
+#define cHeightMapRange (cParallaxMapParams.x)
+
+const float3x3 g_mView : register( SHADER_SPECIFIC_CONST_1 );
+
+const float4 cParallaxMapParams2 : register( SHADER_SPECIFIC_CONST_2 );
+#define cHeightMapOffset (cParallaxMapParams2.x)
+
+//const float4x4 g_FlashlightWorldToTexture :  register( SHADER_SPECIFIC_CONST_6 );
+
+struct VS_INPUT
+{
+	float4 positionWS  : POSITION;
+	float3 vNormalWS   : NORMAL;
+	float2 texCoord    : TEXCOORD0;
+	float3 vBinormalWS : BINORMAL;
+	float3 vTangentWS  : TANGENT;
+	float2 vLightmapTexCoord	: TEXCOORD1;
+	float2 vLightmapTexCoordOffset	: TEXCOORD2;
+};
+
+struct VS_OUTPUT
+{
+	float4 position          : POSITION;	// proj-space position
+	float2 texCoord          : TEXCOORD0;
+//	float3 vLightTS          : TEXCOORD1;   // light vector in tangent space, denormalized
+	float3 vViewTS           : TEXCOORD2;   // view vector in tangent space, denormalized
+	float2 vParallaxOffsetTS : TEXCOORD3;   // Parallax offset vector in tangent space
+	float3 vNormalWS         : TEXCOORD4;   // Normal vector in world space
+	float3 vViewWS           : TEXCOORD5;   // View vector in world space	
+	HALF4 lightmapTexCoord1And2	: TEXCOORD6;
+	HALF4 lightmapTexCoord3		: TEXCOORD7;
+	float  fog					: FOG;
+	float4 worldPos_projPosZ	: TEXCOORD1;
+	float4 fogFactorW			: COLOR1;
+};
+
+VS_OUTPUT main( VS_INPUT i )
+{
+	VS_OUTPUT Out = (VS_OUTPUT) 0;
+
+	// Transform and output input position 
+	float4 position;
+	position = mul( float4( i.positionWS.xyz, 1 ), cModelViewProj );
+	position.y += cHeightMapOffset;
+	Out.position = position;
+	position.z = dot( float4( i.positionWS.xyz, 1 ), cModelViewProjZ );
+
+	// Propagate texture coordinate through:
+	Out.texCoord = i.texCoord; 
+		
+	// Propagate the world vertex normal through:   
+	Out.vNormalWS = i.vNormalWS;
+
+	// Compute and output the world view vector:
+	float3 vViewWS = cEyePos - i.positionWS;
+	Out.vViewWS = vViewWS;
+
+	// Compute denormalized light vector in world space:
+//	float3 vLightWS = vLightPosition - i.positionWS;
+
+	// Normalize the light and view vectors and transform it to the tangent space:
+	float3x3 mWorldToTangent = float3x3( i.vTangentWS, i.vBinormalWS, i.vNormalWS );
+	
+	// Propagate the view and the light vectors (in tangent space):
+//	Out.vLightTS = mul( mWorldToTangent, vLightWS );
+
+	// FIXME: the problem with squashing on oblique angles lies here.
+	// The computation of tangent-space view direction.
+	Out.vViewTS  = normalize(mul( mWorldToTangent, vViewWS  ));
+
+	float fHeightMapRange = cHeightMapRange;
+
+	// Compute the ray direction for intersecting the height field profile with 
+	// current view ray. See the above paper for derivation of this computation.
+
+	// Compute initial parallax displacement direction:
+	float2 vParallaxDirection = normalize(  Out.vViewTS.xy ); 
+
+	// The length of this vector determines the furthest amount of displacement:
+	float fLength = length( Out.vViewTS );
+	float fParallaxLength = sqrt( fLength * fLength - Out.vViewTS.z * Out.vViewTS.z ) / Out.vViewTS.z; 
+	
+	#if DOTPRODUCTFIX
+		fParallaxLength = lerp( 0, fParallaxLength, dot( Out.vNormalWS, normalize(Out.vViewTS.z)  ) );
+	#endif
+
+	// Compute the actual reverse parallax displacement vector:
+	Out.vParallaxOffsetTS = vParallaxDirection * fParallaxLength;
+
+	// Need to scale the amount of displacement to account for different height ranges
+	// in height maps. This is controlled by an artist-editable parameter:
+	Out.vParallaxOffsetTS *= fHeightMapRange;
+		
+	// Lightmap functionality - coords to sample the lightmap by
+	Out.lightmapTexCoord1And2.xy = i.vLightmapTexCoord + i.vLightmapTexCoordOffset;
+
+	float2 lightmapTexCoord2 = Out.lightmapTexCoord1And2.xy + i.vLightmapTexCoordOffset;
+	float2 lightmapTexCoord3 = lightmapTexCoord2 + i.vLightmapTexCoordOffset;
+
+	// reversed component order
+	Out.lightmapTexCoord1And2.w = lightmapTexCoord2.x;
+	Out.lightmapTexCoord1And2.z = lightmapTexCoord2.y;
+	Out.lightmapTexCoord3.xy = lightmapTexCoord3;
+
+	// Fog functionality
+	Out.worldPos_projPosZ.w = position.z;
+	Out.worldPos_projPosZ.xyz = mul( float4( i.positionWS.xyz, 1 ), cModel[0] );
+	
+	Out.fogFactorW = CalcFog( Out.worldPos_projPosZ.xyz, position, g_FogType );
+	Out.fog = Out.fogFactorW;
+	
+	return Out;
+
+}   // End of VS_OUTPUT vs_main(..)
+
+ 
