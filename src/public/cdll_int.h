@@ -1,7 +1,8 @@
 //========================================================================//
 //
 // Purpose: Interfaces between the client.dll and engine
-//
+// DI changes that are not ifdef'd: 
+// - removed all CS/TF/MP stuff
 //===========================================================================//
 
 #ifndef CDLL_INT_H

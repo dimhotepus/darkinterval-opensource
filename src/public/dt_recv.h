@@ -304,7 +304,9 @@ void RecvProxy_Int32ToInt8   ( const CRecvProxyData *pData, void *pStruct, void 
 void RecvProxy_Int32ToInt16  ( const CRecvProxyData *pData, void *pStruct, void *pOut );
 void RecvProxy_StringToString( const CRecvProxyData *pData, void *pStruct, void *pOut );
 void RecvProxy_Int32ToInt32  ( const CRecvProxyData *pData, void *pStruct, void *pOut );
+#ifdef DARKINTERVAL
 void RecvProxy_Int32ToColor32(const CRecvProxyData *pData, void *pStruct, void *pOut);
+#endif
 #ifdef SUPPORTS_INT64
 void RecvProxy_Int64ToInt64  ( const CRecvProxyData *pData, void *pStruct, void *pOut );
 #endif

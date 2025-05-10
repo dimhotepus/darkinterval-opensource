@@ -54,6 +54,7 @@ public:
 	IBoneSetup( const CStudioHdr *pStudioHdr, int boneMask, const float poseParameter[], IPoseDebugger *pPoseDebugger = NULL );
 	~IBoneSetup( void );
 	void InitPose( Vector pos[], Quaternion[] );
+#ifdef DARKINTERVAL
 	// DI NEW
 	void InitPose(
 		const CStudioHdr *pStudioHdr,
@@ -87,7 +88,7 @@ public:
 		float flWeight,
 		float flTime
 	);
-	//
+#endif
 	void AccumulatePose( Vector pos[], Quaternion q[], int sequence, float cycle, float flWeight, float flTime, CIKContext *pIKContext );
 	void CalcAutoplaySequences(	Vector pos[], Quaternion q[], float flRealTime, CIKContext *pIKContext );
 	void CalcBoneAdj( Vector pos[], Quaternion q[], const float controllers[] );

@@ -16,7 +16,12 @@ abstract_class IGameResources
 {
 public:
 	virtual	~IGameResources() {};
-	
+#ifndef DARKINTERVAL // DI is singleplayer, so it ditched teams
+	// Team data access 
+	virtual const char		*GetTeamName(int index) = 0;
+	virtual int				GetTeamScore(int index) = 0;
+	virtual const Color&	GetTeamColor(int index) = 0;
+#endif
 	// Player data access
 	virtual bool	IsConnected( int index ) = 0;
 	virtual bool	IsAlive( int index ) = 0;
@@ -29,6 +34,9 @@ public:
 //	virtual int		GetPacketloss( int index ) = 0;
 	virtual int		GetDeaths( int index ) = 0;
 	virtual int		GetFrags( int index ) = 0;
+#ifndef DARKINTERVAL // DI is singleplayer, so it ditched teams
+	virtual int		GetTeam(int index) = 0;
+#endif
 	virtual int		GetHealth( int index ) = 0;
 };
 

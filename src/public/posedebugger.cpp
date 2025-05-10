@@ -29,14 +29,14 @@
 
 extern IVEngineClient *engine;
 extern CGlobalVarsBase *gpGlobals;
-/*
+#ifndef DARKINTERVAL // reducing amount of convars
 static ConVar ui_posedebug_fade_in_time( "ui_posedebug_fade_in_time", "0.2",
 										 FCVAR_DONTRECORD,
 										 "Time during which a new pose activity layer is shown in green in +posedebug UI" );
 static ConVar ui_posedebug_fade_out_time( "ui_posedebug_fade_out_time", "0.8",
 										  FCVAR_DONTRECORD,
 										  "Time to keep a no longer active pose activity layer in red until removing it from +posedebug UI" );
-*/
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -213,7 +213,11 @@ void ModelPoseDebugInfo::AddInfoText( InfoText *x, ModelPoseDebugInfo *pOld )
 	if ( x )
 	{
 		// Now add it to the array
+#ifdef DARKINTERVAL
 		x->m_flTimeToLive = 0.8f;
+#else
+		x->m_flTimeToLive = ui_posedebug_fade_out_time.GetFloat();
+#endif
 		m_arrTxt.AddToTail( *x );
 	}
 }
@@ -244,10 +248,13 @@ void ModelPoseDebugInfo::PrintPendingInfoText( int &rnPosPrint )
 	nxPrn.time_to_live = -1;
 	nxPrn.color[0] = 1.0f, nxPrn.color[1] = 1.0f, nxPrn.color[2] = 1.0f;
 	nxPrn.fixed_width_font = true;
-
+#ifdef DARKINTERVAL
 	float const flFadeInTime = 0.2f;
 	float const flFadeOutTime = 0.8f;
-
+#else
+	float const flFadeInTime = ui_posedebug_fade_in_time.GetFloat();
+	float const flFadeOutTime = ui_posedebug_fade_out_time.GetFloat();
+#endif
 	// Now print all the accumulated spew
 	for ( int k = m_iCurrentText; k < m_arrTxt.Count(); ++ k )
 	{

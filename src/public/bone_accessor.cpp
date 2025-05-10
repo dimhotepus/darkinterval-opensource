@@ -20,13 +20,19 @@
 				mstudiobone_t *pBone = pHdr->pBone( iBone );
 				if ( bReadable )
 				{
+#ifdef DARKINTERVAL
 					AssertMsgOnce(pBone->flags & m_ReadableBones, "problem with readable bone %s", pBone->pszName);
-				//	AssertOnce( pBone->flags & m_ReadableBones );
+#else
+					AssertOnce( pBone->flags & m_ReadableBones );
+#endif
 				}
 				else
 				{
+#ifdef DARKINTERVAL
 					AssertMsgOnce(pBone->flags & m_WritableBones, "problem with writeable bone %s", pBone->pszName);
-				//	AssertOnce( pBone->flags & m_WritableBones );
+#else
+					AssertOnce( pBone->flags & m_WritableBones );
+#endif
 				}
 			}
 		}

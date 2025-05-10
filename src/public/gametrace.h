@@ -37,11 +37,11 @@ public:
 	
 	// Returns true if we hit something and it wasn't the world.
 	bool DidHitNonWorldEntity() const;
-
+#ifdef DARKINTERVAL // used for example for rain tracing
 	bool DidHitNodrawSurface() const;
 
 	bool DidHitSkybox() const; 
-
+#endif
 	// Gets the entity's network index if the trace has hit an entity.
 	// If not, returns -1.
 	int GetEntityIndex() const;
