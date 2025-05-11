@@ -395,6 +395,7 @@ exit 1
     <ClInclude Include="..\..\public\ihltv.h" />
     <ClInclude Include="..\..\public\ihltvdirector.h" />
     <ClInclude Include="hl2\npc_barnacle.h" />
+    <ClInclude Include="hl2\npc_basezombie.h" />
     <ClInclude Include="hl2\npc_combine_mine.h" />
     <ClInclude Include="hl2\npc_sscanner_beam.h" />
     <ClInclude Include="hl2\npc_sscanner_shield.h" />
@@ -831,7 +832,6 @@ exit 1
     <ClInclude Include="hl2\npc_antlion.h" />
     <ClInclude Include="hl2\npc_helicopter.h" />
     <ClInclude Include="hl2\npc_basescanner.h" />
-    <ClInclude Include="hl2\npc_BaseZombie.h" />
     <ClInclude Include="hl2\npc_bullseye.h" />
     <ClInclude Include="hl2\npc_citizen17.h" />
     <ClInclude Include="hl2\npc_combine.h" />
@@ -1034,6 +1034,7 @@ exit 1
     <ClCompile Include="eventlog.cpp" />
     <ClCompile Include="gamestats_basicstatsfunctions.cpp" />
     <ClCompile Include="hl2\func_monitor.cpp" />
+    <ClCompile Include="hl2\npc_basezombie.cpp" />
     <ClCompile Include="phys_ragdollmagnet.cpp" />
     <ClCompile Include="damagemodifier.cpp" />
     <ClCompile Include="..\..\game\shared\death_pose.cpp" />
@@ -1436,7 +1437,6 @@ exit 1
     <ClCompile Include="hl2\npc_helicopter.cpp" />
     <ClCompile Include="hl2\npc_barney.cpp" />
     <ClCompile Include="hl2\npc_basescanner.cpp" />
-    <ClCompile Include="hl2\npc_BaseZombie.cpp" />
     <ClCompile Include="hl2\npc_breen.cpp" />
     <ClCompile Include="hl2\npc_bullseye.cpp" />
     <ClCompile Include="hl2\npc_citizen17.cpp" />

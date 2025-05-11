@@ -890,9 +890,6 @@
     <ClInclude Include="hl2\npc_citizen17.h">
       <Filter>Source Files\_Darkinterval\Modified\NPCs</Filter>
     </ClInclude>
-    <ClInclude Include="hl2\npc_BaseZombie.h">
-      <Filter>Source Files\_Darkinterval\Modified\NPCs</Filter>
-    </ClInclude>
     <ClInclude Include="hl2\npc_combine.h">
       <Filter>Source Files\_Darkinterval\Modified\NPCs</Filter>
     </ClInclude>
@@ -2036,6 +2033,9 @@
     <ClInclude Include="..\shared\portal\portalsimulation.h">
       <Filter>Source Files\_Portal</Filter>
     </ClInclude>
+    <ClInclude Include="hl2\npc_basezombie.h">
+      <Filter>Source Files\_Darkinterval\Modified\NPCs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -3160,9 +3160,6 @@
     <ClCompile Include="hl2\npc_citizen17.cpp">
       <Filter>Source Files\_Darkinterval\Modified\NPCs</Filter>
     </ClCompile>
-    <ClCompile Include="hl2\npc_BaseZombie.cpp">
-      <Filter>Source Files\_Darkinterval\Modified\NPCs</Filter>
-    </ClCompile>
     <ClCompile Include="hl2\npc_combinedropship.cpp">
       <Filter>Source Files\_Darkinterval\Modified\NPCs</Filter>
     </ClCompile>
@@ -3855,6 +3852,9 @@
     </ClCompile>
     <ClCompile Include="..\shared\portal\portalsimulation.cpp">
       <Filter>Source Files\_Portal</Filter>
+    </ClCompile>
+    <ClCompile Include="hl2\npc_basezombie.cpp">
+      <Filter>Source Files\_Darkinterval\Modified\NPCs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
