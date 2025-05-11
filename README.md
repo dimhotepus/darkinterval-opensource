@@ -48,6 +48,7 @@ There're some exceptions made for brevity (as in not being ifdef'd), including:
 * all instances of gpGlobals->curtime have been replaced with the macro CURTIME (see shareddefs.h);
 * checks for sv_cheats and FCVAR_CHEAT flags have been stripped from most
 convars;
+* CDmgAccumulator has been taken out of TraceAttack, DispatchTraceAttack functions and all the calls;
 
 Also:
 * numerous console commands and variables have been disabled (ifndef'd out) in cases
