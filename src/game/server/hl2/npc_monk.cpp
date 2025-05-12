@@ -138,7 +138,7 @@ void CNPC_Monk::Precache()
 //-----------------------------------------------------------------------------
 void CNPC_Monk::Spawn()
 {
-#ifndef DARKINTERVAL
+#ifdef DARKINTERVAL
 	BaseClass::Spawn();
 
 	// Allow Grigori to have custom models in case we want 'fake' monks like in ch05_haven.
