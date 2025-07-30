@@ -486,6 +486,7 @@ void *__cdecl _nh_malloc_dbg( size_t nSize, int nFlag, int nBlockUse,
 	return g_pMemAlloc->Alloc(nSize, pFileName, nLine);
 }
 
+#if _MSC_VER < 1900 || defined(_DEBUG)
 void *__cdecl _malloc_dbg( size_t nSize, int nBlockUse,
 							const char *pFileName, int nLine )
 {
@@ -501,6 +502,7 @@ void *__cdecl _calloc_dbg( size_t nNum, size_t nSize, int nBlockUse,
 	memset(pMem, 0, nSize * nNum);
 	return pMem;
 }
+#endif
 
 void *__cdecl _calloc_dbg_impl( size_t nNum, size_t nSize, int nBlockUse, 
 	const char * szFileName, int nLine, int * errno_tmp )
@@ -508,6 +510,7 @@ void *__cdecl _calloc_dbg_impl( size_t nNum, size_t nSize, int nBlockUse,
 	return _calloc_dbg( nNum, nSize, nBlockUse, szFileName, nLine );
 }
 
+#if _MSC_VER < 1900 || defined(_DEBUG)
 void *__cdecl _realloc_dbg( void *pMem, size_t nNewSize, int nBlockUse,
 							const char *pFileName, int nLine )
 {
@@ -537,6 +540,7 @@ size_t __cdecl _msize_dbg( void *pMem, int nBlockUse )
 	return 0;
 #endif
 }
+#endif
 
 
 #ifdef _WIN32
@@ -635,7 +639,8 @@ ALLOC_CALL void * __cdecl _aligned_offset_recalloc( void * memblock, size_t coun
 
 extern "C"
 {
-	
+
+#if _MSC_VER < 1900 || defined(_DEBUG)
 int _CrtDumpMemoryLeaks(void)
 {
 	return 0;
@@ -650,6 +655,7 @@ int _CrtSetDbgFlag( int nNewFlag )
 {
 	return g_pMemAlloc->CrtSetDbgFlag( nNewFlag );
 }
+#endif
 
 #if _MSC_VER < 1900
 // 64-bit port.
@@ -674,6 +680,7 @@ void __cdecl _CrtSetDbgBlockType( void *pMem, int nBlockUse )
 	DebuggerBreak();
 }
 
+#if _MSC_VER < 1900 || defined(_DEBUG)
 _CRT_ALLOC_HOOK __cdecl _CrtSetAllocHook( _CRT_ALLOC_HOOK pfnNewHook )
 {
 	DebuggerBreak();
@@ -755,6 +762,7 @@ _CRT_REPORT_HOOK __cdecl _CrtSetReportHook( _CRT_REPORT_HOOK pfnNewHook )
 {
 	return (_CRT_REPORT_HOOK)g_pMemAlloc->CrtSetReportHook( pfnNewHook );
 }
+#endif
 
 int __cdecl _CrtDbgReport( int nRptType, const char * szFile,
         int nLine, const char * szModule, const char * szFormat, ... )
@@ -960,6 +968,7 @@ extern "C" int __cdecl _CrtGetCheckCount( void )
     return __crtDebugCheckCount;
 }
 
+#if _MSC_VER < 1900 || defined(_DEBUG)
 // aligned offset debug
 extern "C" void * __cdecl _aligned_offset_recalloc_dbg( void * memblock, size_t count, size_t size, size_t align, size_t offset, const char * f_name, int line_n )
 {
@@ -983,13 +992,16 @@ _CRT_REPORT_HOOK __cdecl _CrtGetReportHook( void )
 {
 	return NULL;
 }
+#endif
 
 #endif
+
+#if _MSC_VER < 1900 || defined(_DEBUG)
 int __cdecl _CrtReportBlockType(const void * pUserData)
 {
 	return 0;
 }
-
+#endif
 
 } // end extern "C"
 #endif // _WIN32
@@ -1051,11 +1063,13 @@ void __cdecl _free_dbg_nolock( void * pUserData, int nBlockUse)
         _free_dbg(pUserData, 0);
 }
 
+#if _MSC_VER < 1900 || defined(_DEBUG)
 _CRT_ALLOC_HOOK __cdecl _CrtGetAllocHook ( void)
 {
 		assert(0); 
         return NULL;
 }
+#endif
 
 static int __cdecl CheckBytes( unsigned char * pb, unsigned char bCheck, size_t nSize)
 {
@@ -1063,12 +1077,13 @@ static int __cdecl CheckBytes( unsigned char * pb, unsigned char bCheck, size_t 
         return bOkay;
 }
 
-
+#if _MSC_VER < 1900 || defined(_DEBUG)
 _CRT_DUMP_CLIENT __cdecl _CrtGetDumpClient ( void)
 {
 		assert(0); 
         return NULL;
 }
+#endif
 
 #if _MSC_VER >= 1400
 static void __cdecl _printMemBlockData( _locale_t plocinfo, _CrtMemBlockHeader * pHead)
@@ -1079,6 +1094,8 @@ static void __cdecl _CrtMemDumpAllObjectsSince_stat( const _CrtMemState * state,
 {
 }
 #endif
+
+#if _MSC_VER < 1900 || defined(_DEBUG)
 void * __cdecl _aligned_malloc_dbg( size_t size, size_t align, const char * f_name, int line_n)
 {
     return _aligned_malloc(size, align);
@@ -1106,6 +1123,7 @@ void __cdecl _aligned_free_dbg( void * memblock)
 {
     _aligned_free(memblock);
 }
+#endif
 
 #if _MSC_VER < 1900
 size_t __cdecl _CrtSetDebugFillThreshold( size_t _NewDebugFillThreshold)
@@ -1180,11 +1198,13 @@ _TSCHAR * __cdecl _ttempnam ( const _TSCHAR *dir, const _TSCHAR *pfx )
 }
 #endif
 
+#if _MSC_VER < 1900 || defined(_DEBUG)
 wchar_t * __cdecl _wcsdup_dbg ( const wchar_t * string, int nBlockUse, const char * szFileName, int nLine )
 {
 	Assert(0);
 	return 0;
 }
+#endif
 
 wchar_t * __cdecl _wcsdup ( const wchar_t * string )
 {
