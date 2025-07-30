@@ -107,7 +107,9 @@ if ERRORLEVEL 1 exit /b 1
     </PreLinkEvent>
     <Link>
       <AdditionalOptions> /ignore:4221</AdditionalOptions>
-      <AdditionalDependencies>;shell32.lib;user32.lib;advapi32.lib;gdi32.lib;comdlg32.lib;ole32.lib;version.lib;winmm.lib</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(PlatformToolset)'!='v120' And '$(PlatformToolset)'!='v120_xp'">;shell32.lib;user32.lib;advapi32.lib;gdi32.lib;comdlg32.lib;ole32.lib;winmm.lib;legacy_stdio_definitions.lib</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(PlatformToolset)'=='v120'">;shell32.lib;user32.lib;advapi32.lib;gdi32.lib;comdlg32.lib;ole32.lib;winmm.lib</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(PlatformToolset)'=='v120_xp'">;shell32.lib;user32.lib;advapi32.lib;gdi32.lib;comdlg32.lib;ole32.lib;winmm.lib</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <OutputFile>$(OutDir)\game_shader_dx9.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -198,7 +200,9 @@ exit 1
     </PreLinkEvent>
     <Link>
       <AdditionalOptions> /ignore:4221</AdditionalOptions>
-      <AdditionalDependencies>;shell32.lib;user32.lib;advapi32.lib;gdi32.lib;comdlg32.lib;ole32.lib;version.lib;winmm.lib</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(PlatformToolset)'!='v120' And '$(PlatformToolset)'!='v120_xp'">;shell32.lib;user32.lib;advapi32.lib;gdi32.lib;comdlg32.lib;ole32.lib;winmm.lib;legacy_stdio_definitions.lib</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(PlatformToolset)'=='v120'">;shell32.lib;user32.lib;advapi32.lib;gdi32.lib;comdlg32.lib;ole32.lib;winmm.lib</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(PlatformToolset)'=='v120_xp'">;shell32.lib;user32.lib;advapi32.lib;gdi32.lib;comdlg32.lib;ole32.lib;winmm.lib</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <OutputFile>$(OutDir)\game_shader_dx9.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
