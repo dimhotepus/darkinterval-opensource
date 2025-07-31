@@ -23,6 +23,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    
+    - name: Install Microsoft Build Tools 2013
+      run: choco install microsoft-build-tools-2013
 
     # - name: Add MSBuild to PATH
     #  uses: microsoft/setup-msbuild@v2
