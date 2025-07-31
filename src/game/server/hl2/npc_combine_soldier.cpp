@@ -117,7 +117,7 @@ void CNPC_CombineS::Precache()
 			Warning("The list of names for %s is too long, should be no more than %i characters total\n", GetDebugName(), sizeof(allNames));
 			return;
 		}
-		sprintf_s(allNames, sizeof(allNames), "%s", buf); // copy the buffer into the char;	
+		sprintf_s(allNames, sizeof(allNames), "%s", static_cast<const char*>(buf.Base())); // copy the buffer into the char;	
 
 		char *nameToken; // currently tokenised line from the file
 		char *nameLines[512]; // token that will be taken into the nameplate
