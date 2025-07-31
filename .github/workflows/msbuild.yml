@@ -36,4 +36,7 @@ jobs:
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
       run: |
-        "С:\\Program Files (x86)\\MSBuild\\12.0\\Bin\\MSBuild.exe" /m /p:Configuration=${{matrix.configuration}} /p:Platform=${{matrix.platform}} ${{env.SOLUTION_FILE_PATH}}
+        $msbuildPath = "С:\\Program Files (x86)\\MSBuild\\12.0\\Bin\\MSBuild.exe"
+        $solutionPath = "${{env.SOLUTION_FILE_PATH}}"
+        $buildArgs = "/m /p:Configuration=${{matrix.configuration}} /p:Platform=${{matrix.platform}}"
+        Start-Process -FilePath $msbuildPath -ArgumentList "$solutionPath $buildArgs" -Wait -NoNewWindow
