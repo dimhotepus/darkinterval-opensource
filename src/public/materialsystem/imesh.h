@@ -2400,8 +2400,8 @@ private:
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-inline CIndexBuilder::CIndexBuilder() : m_pIndexBuffer(0), m_nIndexCount(0), 
-	m_nCurrentIndex(0),	m_nMaxIndexCount(0)
+inline CIndexBuilder::CIndexBuilder() : m_pIndexBuffer(0), m_nMaxIndexCount(0),
+	m_nIndexCount(0), m_nCurrentIndex(0)
 {
 	m_nTotalIndexCount = 0;
 	m_nBufferOffset = INVALID_BUFFER_OFFSET;
