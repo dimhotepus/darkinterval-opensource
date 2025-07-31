@@ -29,8 +29,7 @@ jobs:
 
     - name: Add MSBuild 2013 & Tools to PATH
       run: |
-        dir 'c:\Program Files (x86)\Microsoft Visual Studio'
-        dir 'c:\Program Files (x86)\Microsoft Visual Studio 14.0'
+        dir 'c:\Program Files (x86)\Microsoft Visual Studio 14.0\SDK'
         pushd 'c:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools'    
         cmd /c "vsvars32.bat&set" |
           foreach {
