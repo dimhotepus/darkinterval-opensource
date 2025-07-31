@@ -4013,13 +4013,16 @@ void CNPC_WaterSquid::ReleaseVictim(void)
 
 		if (touchtest.fraction != 1.0)
 		{
-			/*player*/m_dragvictim_handle->Teleport(&(/*player*/m_dragvictim_handle->GetAbsOrigin() + Vector(0, 0, 16.0f)), NULL, NULL);
+			Vector position = /*player*/m_dragvictim_handle->GetAbsOrigin() + Vector(0, 0, 16.0f);
+			/*player*/m_dragvictim_handle->Teleport(&position, NULL, NULL);
 		}
 
+		Vector position = /*player*/m_dragvictim_handle->GetAbsOrigin() + vFwd * 8;
+		Vector velocity = /*player*/m_dragvictim_handle->GetAbsVelocity() + vFwd * 400;
 		/*player*/m_dragvictim_handle->Teleport(
-			&(/*player*/m_dragvictim_handle->GetAbsOrigin() + vFwd * 8),
+			&position,
 			NULL,
-			&(/*player*/m_dragvictim_handle->GetAbsVelocity() + vFwd * 400));
+			&velocity);
 	}
 
 	// Shrink the bound to avoid player getting stuck. These are restored on the next attack.
