@@ -8662,7 +8662,9 @@ void CNPC_CrabSynth::HandleAnimEvent(animevent_t *pEvent)
 	if ((pEvent->event == AE_CRABSYNTH_MELEE_SWIPE) || (pEvent->event == AE_CRABSYNTH_MELEE_PIN))
 	{
 		bool bIsSwipe = (pEvent->event == AE_CRABSYNTH_MELEE_SWIPE);
-		CheckMeleeAttack(256, bIsSwipe ? QAngle(12.0f, 0.0f, 0.0f) : QAngle(4.0f, 0.0f, 0.0f), bIsSwipe ? Vector(-500.0f, 1.0f, 1.0f) : Vector(-250.0f, 1.0f, 1.0f), bIsSwipe);
+		QAngle viewPunch = bIsSwipe ? QAngle(12.0f, 0.0f, 0.0f) : QAngle(4.0f, 0.0f, 0.0f);
+		Vector shove = bIsSwipe ? Vector(-500.0f, 1.0f, 1.0f) : Vector(-250.0f, 1.0f, 1.0f);
+		CheckMeleeAttack(256, viewPunch, shove, bIsSwipe);
 	//	if (!bIsSwipe) // feels good on both attacks, actually
 		{
 			UTIL_ScreenShake(GetAbsOrigin(), 32.0f, 8.0f, 0.5f, 512, SHAKE_START, true);
