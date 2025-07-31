@@ -1840,7 +1840,11 @@ void CAPCMissile::ComputeActualDotPosition(CLaserDotAPC *pLaserDot, Vector *pAct
 		m_hSpecificTarget = CInfoAPCMissileHint::FindAimTarget(this, STRING(m_strHint), vecOrigin, vecVelocity);
 	}
 
+#ifdef DARKINTERVAL   // Solve ambiguity in conversion: either EHANDLE to CBaseEntity* or CBaseEntity* to EHANDLE.
+	CBaseEntity *pLaserTarget = m_hSpecificTarget ? (CBaseEntity*)m_hSpecificTarget : pLaserDot->GetTargetEntity();
+#else
 	CBaseEntity *pLaserTarget = m_hSpecificTarget ? m_hSpecificTarget : pLaserDot->GetTargetEntity();
+#endif
 	if (!pLaserTarget)
 	{
 #ifdef DARKINTERVAL
@@ -2286,8 +2290,12 @@ void CAPCMissileNPC::ComputeActualDotPosition(CLaserDotAPCNPC *pLaserDot, Vector
 
 		m_hSpecificTarget = CInfoAPCMissileHint::FindAimTarget(this, STRING(m_strHint), vecOrigin, vecVelocity);
 	}
-
+	
+#ifdef DARKINTERVAL   // Solve ambiguity in conversion: either EHANDLE to CBaseEntity* or CBaseEntity* to EHANDLE.
+	CBaseEntity *pLaserTarget = m_hSpecificTarget ? (CBaseEntity*)m_hSpecificTarget : pLaserDot->GetTargetEntity();
+#else
 	CBaseEntity *pLaserTarget = m_hSpecificTarget ? m_hSpecificTarget : pLaserDot->GetTargetEntity();
+#endif
 	if (!pLaserTarget)
 	{
 		*pHomingSpeed = RPG_HOMING_SPEED;
