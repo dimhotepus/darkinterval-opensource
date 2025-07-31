@@ -55,8 +55,14 @@ void C_TestSheetEffect::ComputeRestPositions()
 	// Compute box for fake volume testing
 	Vector dist = GetFixedPoint(0) - GetFixedPoint(1);
 	float l = dist.Length();
+#ifdef DARKINTERVAL  // Do not use MSVC nonstandard extensions as it reduces portability.
+	Vector mins(-l * 0.25f, -l * 0.25f, -l * 0.25f);
+	Vector maxs(l * 0.25f, l * 0.25f, l * 0.25f);
+	SetBoundingBox(mins, maxs);
+#else
 	SetBoundingBox(Vector(-l * 0.25f, -l * 0.25f, -l * 0.25f),
 		Vector(l * 0.25f, l * 0.25f, l * 0.25f));
+#endif
 }
 
 void C_TestSheetEffect::MakeSpring(int p1, int p2)
