@@ -95,6 +95,7 @@ public:
 
 // a list of laser dots to search quickly
 CEntityClassList<CLaserDot> g_LaserDotList;
+template<>
 CLaserDot *CEntityClassList<CLaserDot>::m_pClassList = NULL;
 CLaserDot *GetLaserDotList()
 {
@@ -304,6 +305,7 @@ protected:
 
 // a list of laser dots to search quickly
 CEntityClassList<CLaserDotRPG> g_LaserDotRPGList;
+template<>
 CLaserDotRPG *CEntityClassList<CLaserDotRPG>::m_pClassList = NULL;
 CLaserDotRPG *GetLaserDotRPGList()
 {
@@ -398,6 +400,7 @@ protected:
 
 // a list of laser dots to search quickly
 CEntityClassList<CLaserDotAPCNPC> g_LaserDotAPCNPCList;
+template<>
 CLaserDotAPCNPC *CEntityClassList<CLaserDotAPCNPC>::m_pClassList = NULL;
 CLaserDotAPCNPC *GetLaserDotAPCNPCList()
 {
@@ -492,6 +495,7 @@ protected:
 
 // a list of laser dots to search quickly
 CEntityClassList<CLaserDotAPC> g_LaserDotAPCList;
+template<>
 CLaserDotAPC *CEntityClassList<CLaserDotAPC>::m_pClassList = NULL;
 CLaserDotAPC *GetLaserDotAPCList()
 {
@@ -1320,6 +1324,7 @@ CBaseEntity *CInfoAPCMissileHint::FindAimTarget(CBaseEntity *pMissile, const cha
 //-----------------------------------------------------------------------------
 #ifdef DARKINTERVAL
 CEntityClassList<CAPCMissileNPC> g_APCMissileList;
+template<>
 CAPCMissileNPC *CEntityClassList<CAPCMissileNPC>::m_pClassList = NULL;
 CAPCMissileNPC *GetAPCMissileList()
 #else
