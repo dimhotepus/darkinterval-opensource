@@ -125,7 +125,8 @@ void CNPC_CombineS::Precache()
 		int numLines = 1;
 		char *bufScan = allNames;
 
-		while ((nameToken = strtok(bufScan, nameDelim)) != NULL)
+		while ((nameToken = strtok(bufScan, nameDelim)) != NULL &&
+			    numLines < static_cast<int>(ARRAYSIZE(nameLines)))
 		{
 			bufScan = NULL;
 			//	Msg("%i - %s\n", numLines, nameToken);
