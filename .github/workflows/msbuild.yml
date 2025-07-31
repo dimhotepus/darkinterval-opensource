@@ -30,8 +30,8 @@ jobs:
     # - name: Add MSBuild to PATH
     #  uses: microsoft/setup-msbuild@v2
 
-    - name: Build ${{matrix.platform}}/${{matrix.configuration}} by MSBuild
+    - name: Build v120_xp | ${{matrix.configuration}} | ${{matrix.platform}}  by MSBuild
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
-      run: С:\\Program Files (x86)\\MSBuild\\12.0\\Bin\\MSBuild.exe /m /p:Configuration=${{matrix.configuration}} /p:Platform=${{matrix.platform}} ${{env.SOLUTION_FILE_PATH}}
+      run: С:\\Program Files\ (x86)\\MSBuild\\12.0\\Bin\\MSBuild.exe /m /p:Configuration=${{matrix.configuration}} /p:Platform=${{matrix.platform}} ${{env.SOLUTION_FILE_PATH}}
