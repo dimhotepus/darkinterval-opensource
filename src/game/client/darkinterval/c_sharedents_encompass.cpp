@@ -154,7 +154,7 @@ float C_TestSheetEffect::ComputeOpacity(const Vector& pt, const Vector& center) 
 	dist = sqrt(dist);
 	if (dist > 1.0)
 		dist = 1.0f;
-	return (1.0 - dist) * 35;
+	return (1.0f - dist) * 35;
 }
 
 #if 1
