@@ -27,8 +27,9 @@ jobs:
     - name: Install Microsoft Build Tools 2013
       run: choco install microsoft-build-tools-2013
 
-    # - name: Add MSBuild to PATH
-    #  uses: microsoft/setup-msbuild@v2
+    - name: Add MSBuild & Tools to PATH
+      run: |
+        Invoke-Environment "c:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\vsvars32.bat"
 
     - name: Build v120_xp | ${{matrix.configuration}} | ${{matrix.platform}}  by MSBuild
       working-directory: ${{env.GITHUB_WORKSPACE}}
