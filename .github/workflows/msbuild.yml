@@ -30,8 +30,8 @@ jobs:
     - uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: ${{matrix.platform}}
-        vsversion: 12.0
-    - name: Build v120_xp | ${{matrix.configuration}} | ${{matrix.platform}}  by MSBuild
+        vsversion: 2013
+    - name: Build v120_xp | ${{matrix.configuration}} | ${{matrix.platform}} by MSBuild
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
