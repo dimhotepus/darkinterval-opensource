@@ -25,7 +25,14 @@ jobs:
     - uses: actions/checkout@v4
     
     - name: Install Microsoft Visual C++ Build Tools 2015
-      run: choco install -y vcbuildtools
+      run: |
+        try {
+          choco install -y vcbuildtools
+        } catch {
+           $LASTEXITCODE = 0
+           Write-Host "Install failure."
+           cat C:\ProgramData\chocolatey\logs\chocolatey.log
+        }
       
     - uses: ilammy/msvc-dev-cmd@v1
       with:
