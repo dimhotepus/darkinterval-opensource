@@ -28,7 +28,7 @@ jobs:
       run: |
         $ErrorActionPreference = "Continue"
         try {
-          choco install -y vcbuildtools --install-arguments="'/l*v c:\vcbuildtools_msi_install.log'"'
+          choco install -y vcbuildtools --install-arguments="'/l*v c:\vcbuildtools_msi_install.log'"
         } catch {
            Write-Host "Install failure."
         }
