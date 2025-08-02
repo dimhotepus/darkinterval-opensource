@@ -26,6 +26,7 @@ jobs:
     
     - name: Install Microsoft Visual C++ Build Tools 2015
       run: |
+        $ErrorActionPreference = "Continue"
         try {
           choco install -y vcbuildtools
         } catch {
@@ -33,6 +34,7 @@ jobs:
            Write-Host "Install failure."
            cat C:\ProgramData\chocolatey\logs\chocolatey.log
         }
+        cat C:\ProgramData\chocolatey\logs\chocolatey.log
       
     - uses: ilammy/msvc-dev-cmd@v1
       with:
