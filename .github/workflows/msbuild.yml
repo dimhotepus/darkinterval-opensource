@@ -24,13 +24,13 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Install Microsoft Build Tools 2013
-      run: choco install microsoft-build-tools-2013
+    - name: Install Microsoft Build Tools 2015
+      run: choco install microsoft-build-tools-2015
 
     - uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: ${{matrix.platform}}
-        vsversion: 2013
+        vsversion: 2015
     - name: Build v120_xp | ${{matrix.configuration}} | ${{matrix.platform}} by MSBuild
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
