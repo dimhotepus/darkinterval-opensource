@@ -24,9 +24,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Install Microsoft Build Tools 2015
-      run: choco install microsoft-build-tools-2015
-
+    - name: Install Microsoft Visual C++ Build Tools 2015
+      run: choco install -y vcbuildtools
+      
     - uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: ${{matrix.platform}}
