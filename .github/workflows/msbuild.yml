@@ -28,13 +28,11 @@ jobs:
       run: |
         $ErrorActionPreference = "Continue"
         try {
-          choco install -y vcbuildtools
+          choco install -y vcbuildtools --install-arguments="'/l*v c:\vcbuildtools_msi_install.log'"'
         } catch {
-           $LASTEXITCODE = 0
            Write-Host "Install failure."
-           cat C:\ProgramData\chocolatey\logs\chocolatey.log
         }
-        cat C:\ProgramData\chocolatey\logs\chocolatey.log
+        cat c:\vcbuildtools_msi_install.log
       
     - uses: ilammy/msvc-dev-cmd@v1
       with:
