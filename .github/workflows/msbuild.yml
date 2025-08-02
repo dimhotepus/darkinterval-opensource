@@ -27,12 +27,15 @@ jobs:
     - name: Install Microsoft Visual C++ Build Tools 2015
       run: |
         $ErrorActionPreference = "Continue"
-        try {
-          choco install -y vcbuildtools --install-arguments="'/l*v c:\vcbuildtools_msi_install.log'"
-        } catch {
-           Write-Host "Install failure."
-        }
-        cat c:\vcbuildtools_msi_install.log
+        choco install -y vcbuildtools --install-arguments="'/l*v c:\vcbuildtools_msi_install.log'"
+      
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      if: failure()
+      with:
+        path: |
+          C:\ProgramData\chocolatey\logs
+          C:\Users\runneradmin\AppData\Local\Temp\chocolatey\dd_*.log
       
     - uses: ilammy/msvc-dev-cmd@v1
       with:
