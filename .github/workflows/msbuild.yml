@@ -30,7 +30,7 @@ jobs:
         choco install -y vcbuildtools --install-arguments="'/l*v c:\vcbuildtools_msi_install.log'"
       
     - name: Upload artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         path: |
